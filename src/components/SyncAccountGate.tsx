@@ -20,7 +20,7 @@ export function SyncAccountGate({ children }: { children: ReactNode }) {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
   const sameAuthDomain = config?.authDomain === window.location.hostname;
-  const directLoginUrl = config?.authDomain ? `https://${config.authDomain}/${window.location.hash || '#/'}` : null;
+  const directLoginUrl = config?.authDomain ? `https://${config.authDomain}/${window.location.hash || '#/admin'}` : null;
   const showError = (e: unknown) => {
     const code = (e as { code?: string }).code;
     const messages: Record<string, string> = {

@@ -161,7 +161,7 @@ function ImportDialog({ open, onClose }: { open: boolean; onClose: () => void })
     toast(`تم استيراد ${newTeams.length} فريق`);
     reset();
     onClose();
-    if (!newTeams.every((x) => x.group)) nav('/draw');
+    if (!newTeams.every((x) => x.group)) nav('/admin/draw');
   };
 
   return (
@@ -313,7 +313,7 @@ export default function TeamsPage() {
             <button className="btn btn-ghost" onClick={downloadTemplate}>
               ⬇ القالب
             </button>
-            <Link className="btn btn-ghost" to="/draw">
+            <Link className="btn btn-ghost" to="/admin/draw">
               🎲 القرعة
             </Link>
           </>
@@ -322,7 +322,7 @@ export default function TeamsPage() {
       {outdated && (
         <div className="mb-4 flex flex-wrap items-center gap-3 rounded-xl bg-accent/20 p-3">
           <span className="flex-1">تغيّرت الفرق أو المجموعات بعد توليد الجدول. أعد توليد الجدول من صفحة المباريات.</span>
-          <Link className="btn btn-sm btn-primary" to="/matches">
+          <Link className="btn btn-sm btn-primary" to="/admin/matches">
             المباريات
           </Link>
         </div>
@@ -345,7 +345,7 @@ export default function TeamsPage() {
                 {list.map((team) => (
                   <div key={team.id} className="board flex items-center gap-3 p-3">
                     <TeamMarble teams={t.teams} id={team.id} size={42} />
-                    <Link to={`/team/${team.id}`} className="min-w-0 flex-1">
+                    <Link to={`/admin/team/${team.id}`} className="min-w-0 flex-1">
                       <div className="truncate font-display text-2xl leading-tight">{team.name}</div>
                       <div className="truncate text-sm text-ink/65">
                         {team.player1 || '—'} · {team.player2 || '—'}

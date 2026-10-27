@@ -17,7 +17,7 @@ export function StatsView({ t, big = false, links = true }: { t: Tournament; big
       {big || !links ? (
         <span className="flex-1 truncate font-bold">{teamName(t, id)}</span>
       ) : (
-        <Link to={`/team/${id}`} className="flex-1 truncate font-bold hover:underline">
+        <Link to={`/admin/team/${id}`} className="flex-1 truncate font-bold hover:underline">
           {teamName(t, id)}
         </Link>
       )}

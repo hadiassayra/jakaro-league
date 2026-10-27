@@ -104,7 +104,7 @@ export default function StandingsPage() {
               <button className="btn btn-ghost" onClick={unlock}>
                 إلغاء الاعتماد
               </button>
-              <Link className="btn btn-accent" to="/knockout">
+              <Link className="btn btn-accent" to="/admin/knockout">
                 الأدوار الإقصائية ←
               </Link>
             </>

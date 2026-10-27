@@ -25,7 +25,7 @@ export function adminJoinLink(t: Tournament): string | null {
   if (!config) return null;
   const params = new URLSearchParams({ join: t.id });
   if (!hasBuildConfig()) params.set('fb', encodeConfig(config));
-  return `${baseUrl(t)}#/?${params}`;
+  return `${baseUrl(t)}#/admin?${params}`;
 }
 
 export function SharePanel({ t, compact = false }: { t: Tournament; compact?: boolean }) {

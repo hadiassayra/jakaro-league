@@ -54,7 +54,7 @@ export default function KnockoutPage() {
           <span className="flex-1">
             يجب اعتماد نتائج المجموعات أولاً («اعتماد نتائج المجموعات») قبل توليد الشجرة.
           </span>
-          <Link className="btn btn-sm btn-primary" to="/standings">
+          <Link className="btn btn-sm btn-primary" to="/admin/standings">
             صفحة الترتيب
           </Link>
         </div>

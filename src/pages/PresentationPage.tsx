@@ -272,7 +272,7 @@ export default function PresentationPage() {
                 </div>
               )}
               {slide === 'bracket' && <Bracket t={t} big={koCount <= 8} />}
-              {slide === 'stats' && <StatsView t={t} big />}
+              {slide === 'stats' && <StatsView t={t} big links={false} />}
             </div>
           </motion.div>
         </AnimatePresence>

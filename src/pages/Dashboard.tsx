@@ -73,7 +73,7 @@ export default function Dashboard() {
 
       <div className="space-y-4">
         <section className="space-y-3">
-          <SectionTitle rank="7" title="مركز المباريات" sub={currentDayMatches.length ? `يوم اللعب · ${new Date(t.currentPlayDay! + 'T12:00:00Z').toLocaleDateString('ar-PS', { timeZone: 'Asia/Hebron', weekday: 'long', day: 'numeric', month: 'long' })}` : 'المباريات الحالية والقادمة'} actions={<Link className="btn btn-ghost btn-sm" to="/matches">جدول المباريات ←</Link>} />
+          <SectionTitle rank="7" title="مركز المباريات" sub={currentDayMatches.length ? `يوم اللعب · ${new Date(t.currentPlayDay! + 'T12:00:00Z').toLocaleDateString('ar-PS', { timeZone: 'Asia/Hebron', weekday: 'long', day: 'numeric', month: 'long' })}` : 'المباريات الحالية والقادمة'} actions={<Link className="btn btn-ghost btn-sm" to="/admin/matches">جدول المباريات ←</Link>} />
           <div className="mb-4 flex gap-1 overflow-x-auto border-b border-ink/10" aria-label="حالة المباريات">
             {([['all', 'الكل'], ['playing', 'مباشر'], ['upcoming', 'القادمة'], ['finished', 'النتائج']] as const).map(([key, label]) => <button key={key} aria-pressed={matchView === key} onClick={() => setMatchView(key)} className={`whitespace-nowrap border-b-2 px-4 py-3 text-sm font-bold ${matchView === key ? 'border-primary-ink text-primary-ink' : 'border-transparent text-ink/50'}`}>{label}</button>)}
           </div>
@@ -88,7 +88,7 @@ export default function Dashboard() {
               })}
             </div>
           ) : (
-            <Empty action={group.length ? undefined : <Link className="btn btn-primary" to="/matches">توليد الجدول</Link>}>
+            <Empty action={group.length ? undefined : <Link className="btn btn-primary" to="/admin/matches">توليد الجدول</Link>}>
               {group.length ? 'لا توجد مباريات متبقية حالياً' : 'لم يتم توليد جدول المباريات بعد'}
             </Empty>
           )}

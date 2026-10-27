@@ -13,7 +13,7 @@ export default function TeamProfilePage() {
   const { id } = useParams();
   const t = useStore((s) => s.t);
   const team = t.teams.find((x) => x.id === id);
-  if (!team) return <Empty action={<Link to="/teams" className="btn btn-primary">الفرق</Link>}>الفريق غير موجود</Empty>;
+  if (!team) return <Empty action={<Link to="/admin/teams" className="btn btn-primary">الفرق</Link>}>الفريق غير موجود</Empty>;
 
   const st = team.group ? allStandings(t)[team.group] : [];
   const row = st.find((r) => r.teamId === team.id);
@@ -110,7 +110,7 @@ export default function TeamProfilePage() {
                   <span className={`chip ${won ? 'bg-win' : 'bg-loss'} text-white`}>{won ? 'فوز' : 'خسارة'}</span>
                   <span className="text-xs text-ink/60">{label(m)}</span>
                   <TeamMarble teams={t.teams} id={opp} size={22} />
-                  <Link to={`/team/${opp}`} className="flex-1 font-bold hover:underline">
+                  <Link to={`/admin/team/${opp}`} className="flex-1 font-bold hover:underline">
                     {teamName(t, opp)}
                   </Link>
                   <MarblesLeft n={m.loserMarbles ?? 0} max={t.settings.maxMarbles} size={10} />

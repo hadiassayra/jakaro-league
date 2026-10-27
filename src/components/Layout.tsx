@@ -8,20 +8,20 @@ import { Logo } from './Logo';
 import { Marble } from './ui';
 
 export const NAV = [
-  { to: '/', label: 'الرئيسية', icon: '🏠', end: true },
-  { to: '/teams', label: 'الفرق', icon: '👥' },
-  { to: '/draw', label: 'القرعة', icon: '🎲' },
-  { to: '/matches', label: 'المباريات', icon: '🎯' },
+  { to: '/admin', label: 'الرئيسية', icon: '🏠', end: true },
+  { to: '/admin/teams', label: 'الفرق', icon: '👥' },
+  { to: '/admin/draw', label: 'القرعة', icon: '🎲' },
+  { to: '/admin/matches', label: 'المباريات', icon: '🎯' },
   { to: '/match-display', label: 'شاشة المباريات', icon: '📺' },
-  { to: '/standings', label: 'نقاط المجموعات', icon: '📊' },
-  { to: '/rules', label: 'تعليمات البطولة', icon: '📋' },
-  { to: '/knockout', label: 'الإقصائيات', icon: '🏆' },
-  { to: '/stats', label: 'الإحصائيات', icon: '📈' },
-  { to: '/log', label: 'السجل', icon: '📝' },
-  { to: '/print', label: 'الطباعة والتصدير', icon: '🖨️' },
-  { to: '/settings', label: 'الإعدادات', icon: '⚙️' },
+  { to: '/admin/standings', label: 'نقاط المجموعات', icon: '📊' },
+  { to: '/admin/rules', label: 'تعليمات البطولة', icon: '📋' },
+  { to: '/admin/knockout', label: 'الإقصائيات', icon: '🏆' },
+  { to: '/admin/stats', label: 'الإحصائيات', icon: '📈' },
+  { to: '/admin/log', label: 'السجل', icon: '📝' },
+  { to: '/admin/print', label: 'الطباعة والتصدير', icon: '🖨️' },
+  { to: '/admin/settings', label: 'الإعدادات', icon: '⚙️' },
 ];
-const MOBILE_MAIN = ['/', '/matches', '/standings', '/knockout'];
+const MOBILE_MAIN = ['/admin', '/admin/matches', '/admin/standings', '/admin/knockout'];
 
 function SyncBadge() {
   const { status, error } = useSyncStatus();
@@ -69,7 +69,7 @@ export function Layout() {
     <div className="board-bg min-h-dvh pb-24 lg:pb-8">
       <header className="no-print sticky top-0 z-40 border-b border-ink/10 bg-surface/95 backdrop-blur">
         <div className="mx-auto flex max-w-7xl items-center gap-3 px-4 py-2">
-          <Link to="/" className="flex min-w-0 items-center gap-3">
+          <Link to="/admin" className="flex min-w-0 items-center gap-3">
             <Logo src={s.logo} className="h-9 w-auto max-w-[6rem] rounded-md" />
             <span className="truncate font-display text-xl leading-none sm:text-2xl">{s.name}</span>
           </Link>

@@ -124,7 +124,7 @@ export default function MatchesPage() {
       {ungrouped > 0 && (
         <div className="mb-4 flex flex-wrap items-center gap-3 rounded-xl bg-accent/20 p-3">
           <span className="flex-1">يوجد {ungrouped} فريق بدون مجموعة. أجرِ القرعة أولاً.</span>
-          <Link className="btn btn-sm btn-primary" to="/draw">القرعة</Link>
+          <Link className="btn btn-sm btn-primary" to="/admin/draw">القرعة</Link>
         </div>
       )}
       {outdated && (
@@ -151,7 +151,7 @@ export default function MatchesPage() {
         {ko.length > 0 && (
           <section>
             <h3 className="mb-2 text-2xl">
-              الأدوار الإقصائية <Link to="/knockout" className="text-sm underline">(الشجرة)</Link>
+              الأدوار الإقصائية <Link to="/admin/knockout" className="text-sm underline">(الشجرة)</Link>
             </h3>
             <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
               {ko.map((m) => (

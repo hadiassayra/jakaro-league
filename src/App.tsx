@@ -36,14 +36,14 @@ function AdminTheme() {
   return null;
 }
 
-export default function App() {
-  return (
-    <HashRouter>
-      <Routes>
+export const appRoutes = (
+      <>
+        <Route path="/" element={<LivePage />} />
         <Route path="/live" element={<LivePage />} />
         <Route path="/show" element={<PresentationPage />} />
         <Route path="/match-display" element={<MatchDisplayPage />} />
         <Route
+          path="admin"
           element={
             <>
               <AdminTheme />
@@ -63,9 +63,16 @@ export default function App() {
           <Route path="log" element={<LogPage />} />
           <Route path="print" element={<PrintPage />} />
           <Route path="settings" element={<SettingsPage />} />
-          <Route path="*" element={<Navigate to="/" replace />} />
+          <Route path="*" element={<Navigate to="/admin" replace />} />
         </Route>
-      </Routes>
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </>
+);
+
+export default function App() {
+  return (
+    <HashRouter>
+      <Routes>{appRoutes}</Routes>
       <ConfirmHost />
       <ToastHost />
     </HashRouter>

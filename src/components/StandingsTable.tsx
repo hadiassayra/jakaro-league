@@ -110,7 +110,7 @@ export function StandingsTable({
                   <TeamMarble teams={t.teams} id={r.teamId} size={big ? 52 : 28} />
                   <span className="flex min-w-0 flex-wrap items-center gap-x-2 gap-y-0.5">
                     {linkTeams && !big ? (
-                      <Link to={`/team/${r.teamId}`} className="min-w-0 truncate hover:underline">
+                      <Link to={`/admin/team/${r.teamId}`} className="min-w-0 truncate hover:underline">
                         {name}
                       </Link>
                     ) : (

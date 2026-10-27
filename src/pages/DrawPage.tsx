@@ -124,7 +124,7 @@ export default function DrawPage() {
       return next;
     }, 'اعتماد القرعة');
     toast('تم اعتماد المجموعات وتوليد الجدول');
-    nav('/matches');
+    nav('/admin/matches');
   };
 
   const renderColumn = (g: GroupId) => {
