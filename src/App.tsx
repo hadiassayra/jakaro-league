@@ -19,6 +19,7 @@ import PresentationPage from './pages/PresentationPage';
 import LivePage from './pages/LivePage';
 import RulesPage from './pages/RulesPage';
 import MatchDisplayPage from './pages/MatchDisplayPage';
+import { SyncAccountGate } from './components/SyncAccountGate';
 
 function AdminArea() {
   useAdminSync();
@@ -46,7 +47,7 @@ export default function App() {
           element={
             <>
               <AdminTheme />
-              <AdminArea />
+              <SyncAccountGate><AdminArea /></SyncAccountGate>
             </>
           }
         >

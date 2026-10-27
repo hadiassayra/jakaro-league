@@ -5,3 +5,5 @@ dist
 *.tsbuildinfo
 .env.*
 !.env.example
+.firebase/
+firebase-debug*.log

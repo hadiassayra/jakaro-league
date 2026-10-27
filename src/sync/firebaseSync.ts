@@ -5,6 +5,7 @@
  * Data is stored at /jakaro/{tournamentId} as { json, updatedAt }.
  */
 import type { Tournament } from '../lib/types';
+import { defaultFirebaseConfig } from './defaultConfig';
 
 const LS_KEY = 'jakaro-firebase-config';
 
@@ -49,11 +50,11 @@ export function getSyncConfig(urlParam?: string | null): FirebaseWebConfig | nul
     const fromUrl = decodeConfig(urlParam);
     if (fromUrl) return fromUrl;
   }
-  return parse(import.meta.env.VITE_FIREBASE_CONFIG) ?? parse(localStorage.getItem(LS_KEY));
+  return parse(import.meta.env.VITE_FIREBASE_CONFIG) ?? parse(localStorage.getItem(LS_KEY)) ?? defaultFirebaseConfig;
 }
 
 export function hasBuildConfig(): boolean {
-  return !!parse(import.meta.env.VITE_FIREBASE_CONFIG);
+  return !!parse(import.meta.env.VITE_FIREBASE_CONFIG) || !!defaultFirebaseConfig;
 }
 
 export function saveSyncConfig(raw: string): boolean {
@@ -72,7 +73,7 @@ export function rawSyncConfig(): string {
 }
 
 type DbApi = typeof import('firebase/database');
-let cached: Promise<{ db: ReturnType<DbApi['getDatabase']>; api: DbApi }> | null = null;
+let cached: Promise<{ db: ReturnType<DbApi['getDatabase']>; api: DbApi; app: import('firebase/app').FirebaseApp }> | null = null;
 let cachedUrl = '';
 
 async function connect(config: FirebaseWebConfig) {
@@ -85,10 +86,14 @@ async function connect(config: FirebaseWebConfig) {
       ]);
       const name = `jakaro-${config.databaseURL}`;
       const app = getApps().find((a) => a.name === name) ?? initializeApp(config, name);
-      return { db: api.getDatabase(app), api };
+      return { db: api.getDatabase(app), api, app };
     })();
   }
   return cached;
+}
+
+export async function getFirebaseApp(config: FirebaseWebConfig) {
+  return (await connect(config)).app;
 }
 
 export type SyncStatus = 'off' | 'connecting' | 'live' | 'error';

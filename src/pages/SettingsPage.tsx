@@ -287,7 +287,7 @@ function SyncSection({ t }: { t: Tournament }) {
           {error && <span className="text-xs text-loss" dir="ltr">{error}</span>}
         </div>
         {build ? (
-          <p className="text-sm">تم ضبط Firebase أثناء البناء (VITE_FIREBASE_CONFIG).</p>
+          <p className="text-sm">Firebase مربوط بالموقع. تتزامن النتائج تلقائياً عند تسجيل الدخول بحساب صاحب البطولة.</p>
         ) : (
           <>
             <Field

@@ -26,6 +26,7 @@ export function hashParam(key: string): string | null {
  */
 export function useAdminSync() {
   const version = useSyncStatus((s) => s.version);
+  const localId = useStore(s => s.t.id);
   useEffect(() => {
     const config = getSyncConfig(hashParam('fb'));
     if (!config) {
@@ -33,7 +34,8 @@ export function useAdminSync() {
       return;
     }
     const joinId = hashParam('join');
-    const id = joinId ?? useStore.getState().t.id;
+    const id = joinId ?? config.tournamentId ?? useStore.getState().t.id;
+    const needsAdoption = useStore.getState().t.id !== id;
     let remoteSeen = false;
     let lastRemote = 0;
     let timer: ReturnType<typeof setTimeout> | undefined;
@@ -44,10 +46,11 @@ export function useAdminSync() {
       clearTimeout(timer);
       timer = setTimeout(() => {
         const cur = useStore.getState().t;
-        lastRemote = cur.updatedAt;
-        pushRemote(config, cur).catch((e) =>
-          useSyncStatus.setState({ status: 'error', error: String(e?.message ?? e) }),
-        );
+        if (cur.id !== id) return;
+        pushRemote(config, cur).then(() => {
+          lastRemote = Math.max(lastRemote, cur.updatedAt);
+          useSyncStatus.setState({ status: 'live', error: undefined });
+        }).catch((e) => useSyncStatus.setState({ status: 'error', error: String(e?.message ?? e) }));
       }, 350);
     };
 
@@ -58,10 +61,11 @@ export function useAdminSync() {
         const first = !remoteSeen;
         remoteSeen = true;
         const local = useStore.getState().t;
-        if (remote && (remote.updatedAt > local.updatedAt || (first && joinId && local.id !== remote.id))) {
+        if (remote && (remote.updatedAt > local.updatedAt || (first && (joinId || needsAdoption) && local.id !== remote.id))) {
           lastRemote = remote.updatedAt;
           useStore.getState().replace(remote);
         } else {
+          if (!remote && local.id !== id) useStore.getState().replace({ ...local, id });
           push();
         }
       },
@@ -75,7 +79,7 @@ export function useAdminSync() {
       unsubRemote();
       unsubStore();
     };
-  }, [version]);
+  }, [version, localId]);
 }
 
 /**
@@ -84,20 +88,24 @@ export function useAdminSync() {
  */
 export function useViewTournament(): { t: Tournament | null; remote: boolean; status: SyncStatus } {
   const local = useStore((s) => s.t);
-  const id = hashParam('t');
   const fb = hashParam('fb');
+  const id = hashParam('t') ?? getSyncConfig(fb)?.tournamentId;
   const config = id ? getSyncConfig(fb) : null;
   const useRemote = !!config && !!id;
   const [remote, setRemote] = useState<Tournament | null>(null);
+  const [received, setReceived] = useState(false);
   const [status, setStatus] = useState<SyncStatus>(useRemote ? 'connecting' : 'off');
 
   useEffect(() => {
     if (!useRemote || !config || !id) return;
-    return subscribeRemote(config, id, setRemote, (s) => setStatus(s));
+    setReceived(false);
+    setRemote(null);
+    return subscribeRemote(config, id, value => { setRemote(value); setReceived(true); }, (s) => setStatus(s));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [useRemote, id, fb]);
 
   if (!useRemote) return { t: local, remote: false, status: 'off' };
   // while connecting, fall back to local data when it is the same tournament
-  return { t: remote ?? (local.id === id ? local : null), remote: true, status };
+  const empty = received && !remote ? { ...local, id, teams: [], matches: [], log: [], groupsLocked: false, tieOverrides: { A: [], B: [] } } : null;
+  return { t: remote ?? empty ?? (local.id === id ? local : null), remote: true, status };
 }
