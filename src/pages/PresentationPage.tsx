@@ -134,7 +134,7 @@ export default function PresentationPage() {
     if (!t) return;
     const last = t.matches.filter(isFinished).sort((a, b) => (b.finishedAt ?? 0) - (a.finishedAt ?? 0))[0];
     const sig = last ? `${last.id}:${last.winnerId}:${last.loserMarbles}` : null;
-    if (lastResult.current !== null && sig && sig !== lastResult.current) {
+    if (!paused && lastResult.current !== null && sig && sig !== lastResult.current) {
       const target: SlideKey = last.stage === 'knockout' ? 'bracket' : (last.group as SlideKey);
       const i = slides.indexOf(target);
       if (i >= 0) {
@@ -143,7 +143,7 @@ export default function PresentationPage() {
       }
     }
     lastResult.current = sig ?? '';
-  }, [t, slides]);
+  }, [t, slides, paused]);
 
   const exit = useCallback(() => {
     if (document.fullscreenElement) void document.exitFullscreen();
@@ -157,6 +157,10 @@ export default function PresentationPage() {
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
+      if ((e.key === 'PageDown' || e.key === 'PageUp') && e.target instanceof HTMLElement && e.target.closest('[data-presentation-scroll]')) {
+        setPaused(true);
+        return;
+      }
       if (e.key === 'ArrowLeft' || e.key === 'PageDown') go(1);
       else if (e.key === 'ArrowRight' || e.key === 'PageUp') go(-1);
       else if (e.key === ' ') {
@@ -210,7 +214,7 @@ export default function PresentationPage() {
       onMouseMove={poke}
       onClick={poke}
     >
-      <header className="flex items-center gap-6 bg-primary px-10 py-4 text-on-primary shadow-xl">
+      <header className="flex shrink-0 items-center gap-6 bg-primary px-10 py-4 text-on-primary shadow-xl">
         <BackButton className="text-on-primary" />
         <Logo src={t.settings.logo} variant="outline" className="h-20 w-auto" />
         <div className="font-display text-5xl">{t.settings.name}</div>
@@ -227,20 +231,28 @@ export default function PresentationPage() {
         <AnimatePresence mode="wait">
           <motion.div
             key={slide}
-            className="flex h-full flex-col"
+            className="flex h-full min-h-0 flex-col"
             initial={{ opacity: 0, x: -80 }}
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: 80 }}
             transition={{ duration: 0.45, ease: 'easeOut' }}
           >
-            <div className="mb-5 flex items-center gap-5">
+            <div className="mb-5 flex shrink-0 items-center gap-5">
               <PlayingCard rank={rank} className="text-5xl" />
               <h1 className="text-7xl">{title}</h1>
               {(slide === 'A' || slide === 'B') && (
                 <span className="ms-auto text-3xl text-ink/70">يتأهل أول {q}</span>
               )}
             </div>
-            <div className="min-h-0 flex-1">
+            <div
+              data-presentation-scroll
+              tabIndex={0}
+              role="region"
+              aria-label={`محتوى ${title} — قابل للتمرير`}
+              className="presentation-scroll min-h-0 flex-1 overflow-auto overscroll-contain pb-16 pe-3 focus-visible:outline-2 focus-visible:outline-primary-ink"
+              onScroll={() => { setPaused(true); poke(); }}
+              onTouchMove={() => { setPaused(true); poke(); }}
+            >
               {(slide === 'A' || slide === 'B') && (
                 <StandingsTable
                   t={t}
@@ -278,7 +290,7 @@ export default function PresentationPage() {
         </AnimatePresence>
       </main>
 
-      <footer className="flex items-center gap-4 px-10 pb-5">
+      <footer className="flex shrink-0 items-center gap-4 px-10 pb-5">
         <div className="flex gap-3">
           {slides.map((s, i) => (
             <button
@@ -303,7 +315,8 @@ export default function PresentationPage() {
             />
           )}
         </div>
-        {paused && <span className="text-2xl text-ink/70">⏸ متوقف</span>}
+        <span className="text-xl text-ink/60">مرّر لرؤية باقي الفرق</span>
+        {paused && <span className="text-2xl text-ink/70">⏸ متوقف — اضغط ▶ للاستئناف</span>}
       </footer>
 
       {/* floating controls */}

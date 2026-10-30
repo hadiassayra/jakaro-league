@@ -1,6 +1,7 @@
 @import 'tailwindcss';
 
 .fiction-brand { flex-shrink: 0; }
+.presentation-scroll { scrollbar-width: thin; scrollbar-color: var(--primary-ink) transparent; scrollbar-gutter: stable; touch-action: pan-x pan-y; }
 .fiction-brand--badge { background: #081eaa; padding: 5px 7px; border-radius: 8px; print-color-adjust: exact; -webkit-print-color-adjust: exact; }
 
 /* Tournament fixtures */
