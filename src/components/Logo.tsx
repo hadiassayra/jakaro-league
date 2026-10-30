@@ -1,79 +1,34 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, type CSSProperties } from 'react';
+import badgeLogo from '../assets/brand/fiction-badge.png';
+import outlineLogo from '../assets/brand/fiction-outline.png';
 
-/**
- * Built-in version of the FICTION Board Games Cafe badge, used until a logo is
- * uploaded in Settings. If a file named public/logo.png exists it is used instead.
- */
-export function DefaultLogo({ className = '', style }: { className?: string; style?: React.CSSProperties }) {
-  return (
-    <svg
-      viewBox="0 0 1150 450"
-      className={className}
-      style={style}
-      role="img"
-      aria-label="FICTION Board Games Cafe"
-    >
-      <rect width="1150" height="450" rx="48" fill="#13208f" />
-      <g transform="translate(50 40)">
-        <path d="M45 4 H1000 L1048 44 L1044 222 L1004 262 H48 L4 224 L8 46 Z" fill="#fff" />
-        <rect x="30" y="24" width="988" height="214" rx="24" fill="#13208f" transform="rotate(-0.6 524 131)" />
-        <text
-          x="524"
-          y="206"
-          textAnchor="middle"
-          fill="#ffde00"
-          fontFamily="'Arial Black', 'Lalezar', Impact, sans-serif"
-          fontWeight="900"
-          fontSize="190"
-          textLength="900"
-          lengthAdjust="spacingAndGlyphs"
-          transform="rotate(-0.6 524 131)"
-        >
-          FICTION
-        </text>
-        <text
-          x="524"
-          y="352"
-          textAnchor="middle"
-          fill="#fff"
-          fontFamily="'Arial Black', Impact, sans-serif"
-          fontWeight="900"
-          fontSize="74"
-          textLength="680"
-          lengthAdjust="spacingAndGlyphs"
-        >
-          BOARD GAMES CAFE
-        </text>
-      </g>
-    </svg>
-  );
-}
+type LogoVariant = 'auto' | 'badge' | 'outline';
+type LogoProps = { className?: string; style?: CSSProperties; variant?: LogoVariant };
 
-let publicLogo: Promise<string | null> | null = null;
-function probePublicLogo(): Promise<string | null> {
-  publicLogo ??= new Promise((resolve) => {
-    const img = new Image();
-    img.onload = () => resolve('./logo.png');
-    img.onerror = () => resolve(null);
-    img.src = './logo.png';
-  });
-  return publicLogo;
-}
-
-export function Logo({
-  src,
-  className = '',
-  style,
-}: {
-  src: string | null | undefined;
-  className?: string;
-  style?: React.CSSProperties;
-}) {
-  const [fallback, setFallback] = useState<string | null>(null);
+/** Use the outlined logo on dark surfaces and the blue badge on light surfaces. */
+export function DefaultLogo({ className = '', style, variant = 'auto' }: LogoProps) {
+  const [dark, setDark] = useState(() => typeof document !== 'undefined' && document.documentElement.classList.contains('dark'));
   useEffect(() => {
-    if (!src) void probePublicLogo().then(setFallback);
-  }, [src]);
-  const url = src || fallback;
-  if (!url) return <DefaultLogo className={className} style={style} />;
-  return <img src={url} alt="الشعار" className={`object-contain ${className}`} style={style} />;
+    if (variant !== 'auto') return;
+    const root = document.documentElement;
+    const update = () => setDark(root.classList.contains('dark'));
+    update();
+    const observer = new MutationObserver(update);
+    observer.observe(root, { attributes: true, attributeFilter: ['class'] });
+    return () => observer.disconnect();
+  }, [variant]);
+  const selected = variant === 'auto' ? dark ? 'outline' : 'badge' : variant;
+  return <img
+    src={selected === 'outline' ? outlineLogo : badgeLogo}
+    alt="FICTION Board Games Cafe"
+    className={`fiction-brand fiction-brand--${selected} object-contain ${className}`}
+    style={style}
+    decoding="async"
+  />;
+}
+
+export function Logo({ src, className = '', style, variant = 'auto' }: LogoProps & { src: string | null | undefined }) {
+  const [failed, setFailed] = useState<string | null>(null);
+  if (!src || src === failed) return <DefaultLogo className={className} style={style} variant={variant} />;
+  return <img src={src} alt="شعار البطولة" className={`object-contain ${className}`} style={style} onError={() => setFailed(src)} />;
 }

@@ -51,7 +51,7 @@ export default function LivePage() {
       <header className="sticky top-0 z-30 border-b border-ink/10 bg-surface/95 backdrop-blur">
         <div className="mx-auto flex max-w-5xl items-center gap-3 px-4 py-2">
           <BackButton />
-          <Logo src={t.settings.logo} className="h-9 w-auto max-w-[6rem] rounded-md" />
+          <Logo src={t.settings.logo} className="h-11 w-auto max-w-[8rem] sm:h-12 sm:max-w-[10rem]" />
           <span className="truncate font-display text-xl sm:text-2xl">{t.settings.name}</span>
           <span className="chip ms-auto bg-ink/5 text-ink/80">
             <span className={`live-dot inline-block h-2 w-2 rounded-full ${remote ? (status === 'live' ? 'bg-m-green' : 'bg-m-yellow') : 'bg-loss'}`} />

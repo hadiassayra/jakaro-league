@@ -70,7 +70,7 @@ export function Layout() {
       <header className="no-print sticky top-0 z-40 border-b border-ink/10 bg-surface/95 backdrop-blur">
         <div className="mx-auto flex max-w-7xl items-center gap-3 px-4 py-2">
           <Link to="/admin" className="flex min-w-0 items-center gap-3">
-            <Logo src={s.logo} className="h-9 w-auto max-w-[6rem] rounded-md" />
+            <Logo src={s.logo} className="h-11 w-auto max-w-[8rem] sm:h-12 sm:max-w-[10rem]" />
             <span className="truncate font-display text-xl leading-none sm:text-2xl">{s.name}</span>
           </Link>
           <div className="ms-auto flex items-center gap-1.5">

@@ -212,7 +212,7 @@ export default function PresentationPage() {
     >
       <header className="flex items-center gap-6 bg-primary px-10 py-4 text-on-primary shadow-xl">
         <BackButton className="text-on-primary" />
-        <Logo src={t.settings.logo} className="h-20 w-auto rounded-lg" />
+        <Logo src={t.settings.logo} variant="outline" className="h-20 w-auto" />
         <div className="font-display text-5xl">{t.settings.name}</div>
         <div className="ms-auto flex items-center gap-6 text-3xl">
           <span className="flex items-center gap-2">

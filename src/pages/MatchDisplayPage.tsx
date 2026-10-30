@@ -47,7 +47,7 @@ export default function MatchDisplayPage() {
     <header className="border-b border-ink/10 bg-surface">
       <div className="mx-auto flex max-w-7xl flex-wrap items-center gap-4 px-5 py-5">
         <BackButton />
-        <Logo src={t.settings.logo} className="h-12 w-auto max-w-24 rounded-lg" />
+        <Logo src={t.settings.logo} className="h-14 w-auto max-w-[11rem] sm:h-16 sm:max-w-[13rem]" />
         <div className="flex-1"><p className="text-xs font-bold tracking-widest text-primary-ink">مركز المباريات</p><h1 className="text-3xl sm:text-4xl">{t.settings.name}</h1></div>
         <div className="text-end"><p className="text-2xl font-bold tabular-nums" dir="ltr">{new Date(now).toLocaleTimeString('en-GB', { timeZone: 'Asia/Hebron', hour: '2-digit', minute: '2-digit' })}</p><p className="text-xs text-ink/50">توقيت فلسطين</p></div>
         <button className="btn btn-ghost btn-sm" onClick={fullScreen}>⛶ ملء الشاشة</button>
