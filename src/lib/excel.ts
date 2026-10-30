@@ -88,7 +88,7 @@ export async function exportTournament(t: Tournament) {
         teamName(t, m.teamA),
         teamName(t, m.teamB),
         m.winnerId ? teamName(t, m.winnerId) : '',
-        m.loserMarbles ?? '',
+        m.forfeit ? 'خسارة إدارية بالحمراء' : m.loserMarbles ?? '',
         isFinished(m) ? 'انتهت' : m.status === 'playing' ? 'تُلعب الآن' : 'قادمة',
       ]),
     ],
@@ -107,7 +107,7 @@ export async function exportTournament(t: Tournament) {
           teamName(t, m.teamA),
           teamName(t, m.teamB),
           m.winnerId ? teamName(t, m.winnerId) : '',
-          m.loserMarbles ?? '',
+          m.forfeit ? 'خسارة إدارية بالحمراء' : m.loserMarbles ?? '',
         ]),
       ],
       [20, 22, 22, 22, 18],
@@ -120,6 +120,14 @@ export async function exportTournament(t: Tournament) {
     [TEMPLATE_HEADERS, ...t.teams.map((tm) => [tm.name, tm.player1, tm.player2, gName(tm.group)])],
     [24, 18, 18, 10],
   );
+  addSheet(XLSX, wb, 'البطاقات والعقوبات', [
+    ['المباراة', 'الفريق', 'المرحلة', 'الصفراء', 'الحمراء', 'خصم النقاط', 'خسارة مباشرة'],
+    ...t.matches.flatMap(m => Object.entries(m.cards ?? {}).filter(([, cards]) => cards.yellow || cards.red).map(([id, cards]) => [
+      `${teamName(t, m.teamA)} × ${teamName(t, m.teamB)}`,
+      teamName(t, id), m.stage === 'group' ? 'مجموعات' : 'إقصائيات', cards.yellow,
+      cards.red ? 'نعم' : '', m.stage === 'group' && cards.yellow >= 2 ? 1 : 0, m.forfeit?.teamId === id ? 'نعم' : '',
+    ])),
+  ], [45, 24, 14, 10, 10, 14, 16]);
   XLSX.writeFile(wb, `${t.settings.name || 'دوري جاكرو'} - النتائج.xlsx`);
 }
 

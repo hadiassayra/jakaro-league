@@ -8,6 +8,7 @@ import { playClick, playFanfare, playWin } from '../lib/sound';
 import { useStore } from '../store/useStore';
 import { confirmDialog, toast } from '../store/ui';
 import { Marble, Modal, TeamMarble } from './ui';
+import { DisciplineControls } from './DisciplineControls';
 
 export function undoToast(text: string) {
   toast(text, {
@@ -30,7 +31,7 @@ export function ResultModal({ match, onClose }: { match: Match | null; onClose: 
     setWinner(m?.winnerId ?? null);
     setLeft(m?.loserMarbles ?? null);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [match?.id]);
+  }, [match?.id, m?.winnerId, m?.loserMarbles]);
 
   if (!m) return <Modal open={false} onClose={onClose}>{null}</Modal>;
   const locked = m.stage === 'group' && t.groupsLocked;
@@ -67,7 +68,7 @@ export function ResultModal({ match, onClose }: { match: Match | null; onClose: 
     return (
       <button
         key={id}
-        disabled={locked}
+        disabled={locked || !!m.forfeit}
         onClick={() => {
           setWinner(id);
           playClick();
@@ -97,6 +98,8 @@ export function ResultModal({ match, onClose }: { match: Match | null; onClose: 
           نتائج المجموعات معتمدة ومقفلة. ألغِ الاعتماد من صفحة الترتيب للتعديل.
         </p>
       )}
+      <DisciplineControls key={m.id} match={m} locked={locked} />
+      {m.forfeit && <p className="mb-4 rounded-xl bg-loss/15 p-3 text-sm font-bold">خسارة مباشرة بسبب البطاقة الحمراء لـ {teamName(t, m.forfeit.teamId)}. لتصحيح النتيجة ألغِ الحمراء من «تصحيح آخر بطاقة».</p>}
       <div className="mb-2 text-sm font-bold text-ink/70">١. اضغط على الفريق الفائز</div>
       <div className="mb-5 flex gap-3">
         {teamBtn(m.teamA!)}
@@ -111,7 +114,7 @@ export function ResultModal({ match, onClose }: { match: Match | null; onClose: 
         {Array.from({ length: max + 1 }, (_, n) => (
           <button
             key={n}
-            disabled={locked}
+            disabled={locked || !!m.forfeit}
             onClick={() => {
               setLeft(n);
               playClick();
@@ -140,7 +143,7 @@ export function ResultModal({ match, onClose }: { match: Match | null; onClose: 
             onChange={(e) => apply((x) => setMatchTable(x, m.id, e.target.value ? Number(e.target.value) : null))}
           />
         </label>
-        {!done && (
+        {!done && !locked && (
           <button
             className={`btn btn-sm ${m.status === 'playing' ? 'btn-ghost' : 'btn-accent'}`}
             onClick={() => apply((x) => setMatchStatus(x, m.id, m.status === 'playing' ? 'upcoming' : 'playing'))}
@@ -151,10 +154,10 @@ export function ResultModal({ match, onClose }: { match: Match | null; onClose: 
       </div>
 
       <div className="flex flex-wrap gap-2">
-        <button className="btn btn-primary flex-1 py-3 text-lg" disabled={!winner || left === null || locked} onClick={save}>
+        <button className="btn btn-primary flex-1 py-3 text-lg" disabled={!winner || left === null || locked || !!m.forfeit} onClick={save}>
           حفظ النتيجة
         </button>
-        {done && !locked && (
+        {done && !locked && !m.forfeit && (
           <button className="btn btn-danger" onClick={remove}>
             حذف النتيجة
           </button>

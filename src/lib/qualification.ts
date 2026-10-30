@@ -35,8 +35,8 @@ export function qualificationStatus(
     return result;
   }
 
-  const pts = new Map(ids.map((id) => [id, 0]));
-  gm.filter(isFinished).forEach((m) => pts.set(m.winnerId!, (pts.get(m.winnerId!) ?? 0) + 1));
+  // Include the deductions and administrative corrections already in the table.
+  const pts = new Map(ids.map((id) => [id, standings.find(row => row.teamId === id)?.points ?? 0]));
 
   const canFail = new Set<string>(); // some scenario puts the team outside top q
   const canMake = new Set<string>(); // some scenario puts the team inside top q

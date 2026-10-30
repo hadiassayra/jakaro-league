@@ -40,8 +40,9 @@ export function countComebacks(teamId: string, matches: Match[]): number {
 
 export function computeStats(teams: Team[], matches: Match[]): TournamentStats {
   const done = matches.filter(isFinished);
-  const maxLeft = Math.max(-1, ...done.map((m) => m.loserMarbles ?? 0));
-  const biggestWins = maxLeft >= 0 ? done.filter((m) => m.loserMarbles === maxLeft) : [];
+  const played = done.filter(m => !m.forfeit);
+  const maxLeft = Math.max(-1, ...played.map((m) => m.loserMarbles ?? 0));
+  const biggestWins = maxLeft >= 0 ? played.filter((m) => m.loserMarbles === maxLeft) : [];
 
   const unbeaten = teams
     .map((t) => ({ teamId: t.id, s: teamStats(t.id, matches) }))
@@ -54,7 +55,7 @@ export function computeStats(teams: Team[], matches: Match[]): TournamentStats {
     .filter((c) => c.count > 0)
     .sort((a, b) => b.count - a.count);
 
-  const avg = done.length ? done.reduce((s, m) => s + (m.loserMarbles ?? 0), 0) / done.length : 0;
+  const avg = played.length ? played.reduce((s, m) => s + (m.loserMarbles ?? 0), 0) / played.length : 0;
 
   const groupMatches = matches.filter((m) => m.stage === 'group');
   const marbleLeaders = teams
@@ -83,7 +84,7 @@ export function computeStats(teams: Team[], matches: Match[]): TournamentStats {
     comebacks,
     totalComebacks: comebacks.reduce((s, c) => s + c.count, 0),
     avgMarblesLeft: Math.round(avg * 10) / 10,
-    shutouts: done.filter((m) => m.loserMarbles === 0).length,
+    shutouts: played.filter((m) => m.loserMarbles === 0).length,
     marbleLeaders,
     longestStreak,
   };

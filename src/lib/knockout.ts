@@ -143,6 +143,8 @@ export function syncBracket(ko: Match[]): Match[] {
 }
 
 function clearResult(m: Match) {
+  m.cards = undefined;
+  m.forfeit = undefined;
   m.winnerId = null;
   m.loserMarbles = null;
   m.finishedAt = null;

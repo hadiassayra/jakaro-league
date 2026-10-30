@@ -5,6 +5,7 @@ import { teamName } from '../lib/tournament';
 import { koRoundLabel } from '../lib/knockout';
 import { matchDayRound } from '../lib/playDay';
 import { Marble, TeamMarble } from './ui';
+import { CardsBadge } from './CardsBadge';
 
 export function useNow(intervalMs = 1000) {
   const [now, setNow] = useState(Date.now());
@@ -83,6 +84,7 @@ export function MatchCard({
         {id ? <TeamMarble teams={t.teams} id={id} size={entry?.logo ? big ? 68 : 48 : big ? 56 : 36} /> : <span className="text-2xl text-ink/40">؟</span>}
       </div>
       <span className={`fixture-name ${winner ? 'text-accent-ink' : ''}`}>{id ? teamName(t, id) : 'بانتظار المتأهل'}</span>
+      <CardsBadge match={m} teamId={id} />
       {done && <span className={winner ? 'fixture-winner' : 'fixture-players'}>{winner ? '✓ فوز' : 'خسارة'}</span>}
       {entry && (entry.player1 || entry.player2) && <span className="fixture-players">{[entry.player1, entry.player2].filter(Boolean).join(' · ')}</span>}
     </div>;
@@ -107,6 +109,6 @@ export function MatchCard({
       <span>{date}{m.playDay ? ` · ${matchDayRound(m) === 1 ? 'الجولة الأولى' : 'الجولة الثانية'}` : ''}</span>
       {m.table != null && <span>طاولة {m.table}</span>}
     </div>
-    {done && <div className="fixture-result"><span>كرات الخاسر المتبقية</span><MarblesLeft n={m.loserMarbles ?? 0} max={t.settings.maxMarbles} size={big ? 15 : 9} /><strong>{m.loserMarbles ?? '—'}</strong></div>}
+    {m.forfeit ? <div className="fixture-result font-bold text-loss">خسارة مباشرة: {teamName(t, m.forfeit.teamId)} — بطاقة حمراء</div> : done && <div className="fixture-result"><span>كرات الخاسر المتبقية</span><MarblesLeft n={m.loserMarbles ?? 0} max={t.settings.maxMarbles} size={big ? 15 : 9} /><strong>{m.loserMarbles ?? '—'}</strong></div>}
   </Tag>;
 }

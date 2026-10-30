@@ -119,7 +119,12 @@ export function computeStandings(
 ): StandingRow[] {
   const groupTeams = teams.filter((t) => t.group === group);
   const groupMatches = matches.filter((m) => m.stage === 'group' && m.group === group);
-  const base = groupTeams.map((t) => ({ teamId: t.id, ...teamStats(t.id, groupMatches) }));
+  const base = groupTeams.map((t) => {
+    const stats = teamStats(t.id, groupMatches);
+    const disciplinaryDeduction = groupMatches.filter(m => (m.cards?.[t.id]?.yellow ?? 0) >= 2).length;
+    const pointsAdjustment = t.pointsAdjustment ?? 0;
+    return { teamId: t.id, ...stats, disciplinaryDeduction, pointsAdjustment, points: stats.points - disciplinaryDeduction + pointsAdjustment };
+  });
   base.sort((a, b) => b.points - a.points || b.marblePoints - a.marblePoints);
 
   const rows: StandingRow[] = [];

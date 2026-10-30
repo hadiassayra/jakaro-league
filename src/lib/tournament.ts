@@ -68,7 +68,7 @@ export function generateSchedule(t: Tournament): Tournament {
   );
 }
 
-function patchMatch(t: Tournament, id: string, fn: (m: Match) => Match): Tournament {
+export function patchMatch(t: Tournament, id: string, fn: (m: Match) => Match): Tournament {
   let matches = t.matches.map((m) => (m.id === id ? fn({ ...m }) : m));
   const changed = matches.find((m) => m.id === id);
   if (changed?.stage === 'knockout') {
@@ -90,6 +90,7 @@ export function recordResult(
 ): Tournament {
   const m = t.matches.find((x) => x.id === matchId);
   if (!m) return t;
+  if (m.forfeit) throw new Error('صحّح البطاقة الحمراء أولاً لتعديل نتيجة الخسارة المباشرة.');
   if (winnerId !== m.teamA && winnerId !== m.teamB) throw new Error('الفائز ليس طرفاً في المباراة');
   const lm = Math.max(0, Math.min(t.settings.maxMarbles, Math.round(loserMarbles)));
   const wasFinished = isFinished(m);
@@ -109,6 +110,7 @@ export function recordResult(
 export function clearResult(t: Tournament, matchId: string): Tournament {
   const m = t.matches.find((x) => x.id === matchId);
   if (!m) return t;
+  if (m.forfeit) throw new Error('ألغِ البطاقة الحمراء أولاً؛ ستُستعاد حالة المباراة السابقة تلقائياً.');
   const next = patchMatch(t, matchId, (x) => ({
     ...x,
     winnerId: null,
@@ -122,7 +124,7 @@ export function clearResult(t: Tournament, matchId: string): Tournament {
 
 export function setMatchStatus(t: Tournament, matchId: string, status: MatchStatus): Tournament {
   const m = t.matches.find((x) => x.id === matchId);
-  if (!m || status === 'finished') return t;
+  if (!m || m.forfeit || (m.stage === 'group' && t.groupsLocked) || status === 'finished') return t;
   const next = patchMatch(t, matchId, (x) => ({
     ...x,
     status,

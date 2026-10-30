@@ -10,6 +10,7 @@ import { shuffle } from '../lib/id';
 import { playClick } from '../lib/sound';
 import { StandingsTable, groupLabel } from '../components/StandingsTable';
 import { Empty, SectionTitle, TeamMarble } from '../components/ui';
+import { PointsCorrection } from '../components/PointsCorrection';
 
 function TieResolver({ group, ids }: { group: GroupId; ids: string[] }) {
   const t = useStore((s) => s.t);
@@ -167,6 +168,7 @@ export default function StandingsPage() {
         </div>
       )}
 
+      <PointsCorrection key={group} group={group} />
       <section className="board mt-6 p-4 text-sm">
         <h3 className="mb-2 text-xl">طريقة الترتيب</h3>
         <ol className="list-inside list-decimal space-y-1 text-ink/80">

@@ -4,6 +4,8 @@ export const GROUPS: GroupId[] = ['A', 'B'];
 export interface Team {
   id: string;
   logo?: string | null;
+  pointsAdjustment?: number;
+  pointsAdjustmentReason?: string;
   name: string;
   player1: string;
   player2: string;
@@ -13,8 +15,23 @@ export interface Team {
 export type MatchStatus = 'upcoming' | 'playing' | 'finished';
 export type Stage = 'group' | 'knockout';
 
+export interface MatchCards {
+  yellow: number;
+  red: boolean;
+}
+
+export interface MatchResultSnapshot {
+  winnerId: string | null;
+  loserMarbles: number | null;
+  status: MatchStatus;
+  startedAt: number | null;
+  finishedAt: number | null;
+}
+
 export interface Match {
   id: string;
+  cards?: Record<string, MatchCards>;
+  forfeit?: { teamId: string; prior: MatchResultSnapshot };
   scheduledAt?: number | null;
   playDay?: string | null;
   dayRound?: 1 | 2 | null;
@@ -94,6 +111,8 @@ export interface StandingRow {
   won: number;
   lost: number;
   points: number;
+  disciplinaryDeduction?: number;
+  pointsAdjustment?: number;
   marblePoints: number;
   /** oldest → newest */
   form: ('W' | 'L')[];

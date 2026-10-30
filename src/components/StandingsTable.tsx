@@ -131,7 +131,11 @@ export function StandingsTable({
                 <span className={cell}>{r.played}</span>
                 <span className={`${cell} ${hideSm} text-win`}>{r.won}</span>
                 <span className={`${cell} ${hideSm} text-loss`}>{r.lost}</span>
-                <span className={`${cell} font-display ${big ? 'text-5xl' : 'text-2xl'}`}>{r.points}</span>
+                <span className={cell} title={`خصم البطاقات: ${r.disciplinaryDeduction ?? 0}، التصحيح الإداري: ${r.pointsAdjustment ?? 0}`}>
+                  <span className={`block font-display ${big ? 'text-5xl' : 'text-2xl'}`}>{r.points}</span>
+                  {!!r.disciplinaryDeduction && <span className="block text-[10px] font-bold text-loss">بطاقات −{r.disciplinaryDeduction}</span>}
+                  {!!r.pointsAdjustment && <span className="block text-[10px] text-primary-ink">تصحيح {r.pointsAdjustment > 0 ? '+' : ''}{r.pointsAdjustment}</span>}
+                </span>
                 <span className={`${cell} font-bold ${r.marblePoints > 0 ? 'text-win' : r.marblePoints < 0 ? 'text-loss' : ''}`}>
                   <span dir="ltr">
                     {r.marblePoints > 0 ? `+${r.marblePoints}` : r.marblePoints}

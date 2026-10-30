@@ -4,6 +4,7 @@ import { bracketRounds, champion, koMatches, roundName } from '../lib/knockout';
 import { isFinished } from '../lib/standings';
 import { allStandings, teamName } from '../lib/tournament';
 import { TeamMarble } from './ui';
+import { CardsBadge } from './CardsBadge';
 
 function seedLabels(t: Tournament): Map<string, string> {
   const st = allStandings(t);
@@ -46,6 +47,7 @@ function BracketMatch({
           {id ? teamName(t, id) : '—'}
         </span>
         {seeds && id && <span className={`chip bg-ink/10 ${big ? 'text-lg' : 'text-[10px]'}`}>{seeds.get(id)}</span>}
+        <CardsBadge match={m} teamId={id} />
         {win && <span className={`font-black text-win ${big ? 'text-3xl' : ''}`}>✓</span>}
       </div>
     );
