@@ -5,7 +5,7 @@ import { allStandings, teamName } from '../lib/tournament';
 import { koMatches } from '../lib/knockout';
 import { exportTournament, downloadJson } from '../lib/excel';
 import { Bracket } from '../components/Bracket';
-import { Logo } from '../components/Logo';
+import { BrandLogos } from '../components/BrandLogos';
 import { SectionTitle } from '../components/ui';
 
 const PAPER_VARS = {
@@ -21,7 +21,7 @@ function Page({ t, title, children }: { t: Tournament; title: string; children: 
   return (
     <div className="print-page mb-6 rounded-lg bg-white p-6 text-black shadow-lg print:mb-0 print:rounded-none print:p-0 print:shadow-none">
       <div className="mb-4 flex items-center gap-4 border-b-2 border-black/80 pb-3">
-        <Logo src={t.settings.logo} variant="badge" className="h-14 w-auto" />
+        <BrandLogos src={t.settings.logo} variant="badge" size="print" />
         <div className="flex-1">
           <div className="font-display text-3xl">{t.settings.name}</div>
           <div className="text-lg font-bold">{title}</div>

@@ -12,7 +12,7 @@ import { playFanfare, playWin } from '../lib/sound';
 import { StandingsTable } from '../components/StandingsTable';
 import { MatchCard, useNow } from '../components/MatchCard';
 import { Bracket } from '../components/Bracket';
-import { Logo } from '../components/Logo';
+import { BrandLogos } from '../components/BrandLogos';
 import { BackButton } from '../components/BackButton';
 import { RevealOverlay, type RevealItem } from '../components/Reveal';
 import { StatsView } from './StatsPage';
@@ -216,7 +216,7 @@ export default function PresentationPage() {
     >
       <header className="flex shrink-0 items-center gap-6 bg-primary px-10 py-4 text-on-primary shadow-xl">
         <BackButton className="text-on-primary" />
-        <Logo src={t.settings.logo} variant="outline" className="h-20 w-auto" />
+        <BrandLogos src={t.settings.logo} variant="outline" size="presentation" />
         <div className="font-display text-5xl">{t.settings.name}</div>
         <div className="ms-auto flex items-center gap-6 text-3xl">
           <span className="flex items-center gap-2">

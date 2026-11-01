@@ -8,6 +8,10 @@ Prepared from the two logo references supplied by the site owner, using the buil
 
 ## Final prompts
 
+### TMAX Energy Drink
+
+`tmax-energy-drink.svg` contains the original outlined vector paths extracted from the user-supplied `180x90cm.pdf`. The black banner background was omitted; the interface supplies a dark backing for contrast. No fonts or generated replacement lettering are used for this mark.
+
 ### Blue badge
 
 Create a production-clean faithful reconstruction of the supplied FICTION BOARD GAMES CAFE logo as a crisp flat vector-style bitmap with TRUE transparent alpha background. Exact branding: bright yellow heavy uppercase FICTION inside a deep royal-blue long horizontal badge; thick white continuous chamfered rounded rectangular outline. Below badge, clean solid white uppercase bold BOARD GAMES CAFE, centered. Match the reference letterforms, layout, proportions and colors very closely. All edges must be smooth and clean, all letter interiors fully filled with their original solid colors. Remove all gray checkerboard, all stray white pixels, all scratches, fringe, noise and debris. NO texture, no outlines around individual letters, no shadows, no checkerboard background. Wide horizontal logo about 3:1 aspect ratio, tightly fitted with 3% transparent margins. This is the same established logo, do not invent a different design.

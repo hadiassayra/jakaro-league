@@ -6,7 +6,7 @@ import { isFinished } from '../lib/standings';
 import { allStandings, nextMatches, teamName } from '../lib/tournament';
 import { champion } from '../lib/knockout';
 import { qualificationStatus } from '../lib/qualification';
-import { Logo } from '../components/Logo';
+import { BrandLogos } from '../components/BrandLogos';
 import { MatchCard } from '../components/MatchCard';
 import { ResultModal } from '../components/ResultModal';
 import { StandingsTable, groupLabel } from '../components/StandingsTable';
@@ -34,7 +34,7 @@ export default function Dashboard() {
     <div className="space-y-6">
       <section className="board overflow-hidden">
         <div className="flex flex-col items-center gap-4 p-5 sm:flex-row">
-          <Logo src={t.settings.logo} className="h-16 w-auto max-w-[10rem] rounded-lg" />
+          <BrandLogos src={t.settings.logo} />
           <div className="w-full flex-1 text-center sm:text-start">
             <p className="text-sm font-bold text-primary-ink">{stage}</p>
             <h1 className="text-3xl">{t.settings.name}</h1>

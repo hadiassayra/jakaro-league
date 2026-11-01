@@ -4,7 +4,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { useStore } from '../store/useStore';
 import { sha256, toast, useUi } from '../store/ui';
 import { useSyncStatus } from '../sync/useSync';
-import { Logo } from './Logo';
+import { BrandLogos } from './BrandLogos';
 import { Marble } from './ui';
 
 export const NAV = [
@@ -70,7 +70,7 @@ export function Layout() {
       <header className="no-print sticky top-0 z-40 border-b border-ink/10 bg-surface/95 backdrop-blur">
         <div className="mx-auto flex max-w-7xl items-center gap-3 px-4 py-2">
           <Link to="/admin" className="flex min-w-0 items-center gap-3">
-            <Logo src={s.logo} className="h-11 w-auto max-w-[8rem] sm:h-12 sm:max-w-[10rem]" />
+            <BrandLogos src={s.logo} />
             <span className="truncate font-display text-xl leading-none sm:text-2xl">{s.name}</span>
           </Link>
           <div className="ms-auto flex items-center gap-1.5">
@@ -211,7 +211,7 @@ export function PinGate({ children }: { children: React.ReactNode }) {
   return (
     <div className="board-bg grid min-h-dvh place-items-center p-4">
       <form onSubmit={submit} className="board flex w-full max-w-sm flex-col items-center gap-4 p-6 text-center">
-        <Logo src={logo} className="h-24 w-auto rounded-xl" />
+        <BrandLogos src={logo} size="standard" />
         <h1 className="text-3xl">{name}</h1>
         <p className="text-ink/70">لوحة الإدارة محمية برمز PIN</p>
         <input

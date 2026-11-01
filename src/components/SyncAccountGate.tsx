@@ -2,7 +2,7 @@ import { useEffect, useRef, useState, type ReactNode } from 'react';
 import type { Auth, User } from 'firebase/auth';
 import { Link } from 'react-router-dom';
 import { getFirebaseApp, getSyncConfig } from '../sync/firebaseSync';
-import { Logo } from './Logo';
+import { BrandLogos } from './BrandLogos';
 import { MarbleLoader } from './ui';
 import { useStore } from '../store/useStore';
 import { openDirectLogin, useAuthTransfer } from '../sync/authTransfer';
@@ -71,7 +71,7 @@ export function SyncAccountGate({ children }: { children: ReactNode }) {
   };
   return <div className="board-bg grid min-h-dvh place-items-center px-4 py-8">
     <section className="board w-full max-w-md space-y-5 p-7 text-center">
-      <Logo src={logo} className="mx-auto h-20 w-auto rounded-xl" />
+      <BrandLogos src={logo} size="standard" />
       <div><h1 className="text-3xl">إدارة البطولة</h1><p className="mt-2 text-sm text-ink/65">سجّل بحسابك لإدارة المباريات ومزامنة النتائج بين أجهزتك.</p></div>
       <p className="text-sm font-bold" dir="ltr">{owner}</p>
       {!ready || transferring ? <MarbleLoader label={transferring ? 'جارٍ نقل بيانات البطولة من نافذتك…' : 'جارٍ التحقق من الحساب…'} /> : <button className="btn btn-primary w-full" disabled={!auth || busy} onClick={login}>{busy ? 'جارٍ تسجيل الدخول…' : 'تسجيل الدخول بحساب Google'}</button>}

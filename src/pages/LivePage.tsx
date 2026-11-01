@@ -13,7 +13,7 @@ import { teamName } from '../lib/tournament';
 import { StandingsTable, groupLabel } from '../components/StandingsTable';
 import { MatchCard } from '../components/MatchCard';
 import { Bracket } from '../components/Bracket';
-import { Logo } from '../components/Logo';
+import { BrandLogos } from '../components/BrandLogos';
 import { StatsView } from './StatsPage';
 import { Empty, MarbleLoader, SectionTitle, TeamMarble } from '../components/ui';
 
@@ -49,10 +49,10 @@ export default function LivePage() {
   return (
     <div className="board-bg min-h-dvh pb-10">
       <header className="sticky top-0 z-30 border-b border-ink/10 bg-surface/95 backdrop-blur">
-        <div className="mx-auto flex max-w-5xl items-center gap-3 px-4 py-2">
+        <div className="mx-auto flex max-w-5xl flex-wrap items-center gap-3 px-4 py-2 sm:flex-nowrap">
           <BackButton />
-          <Logo src={t.settings.logo} className="h-11 w-auto max-w-[8rem] sm:h-12 sm:max-w-[10rem]" />
-          <span className="truncate font-display text-xl sm:text-2xl">{t.settings.name}</span>
+          <BrandLogos src={t.settings.logo} />
+          <span className="order-last w-full truncate font-display text-xl sm:order-none sm:w-auto sm:text-2xl">{t.settings.name}</span>
           <span className="chip ms-auto bg-ink/5 text-ink/80">
             <span className={`live-dot inline-block h-2 w-2 rounded-full ${remote ? (status === 'live' ? 'bg-m-green' : 'bg-m-yellow') : 'bg-loss'}`} />
             مباشر
