@@ -12,6 +12,8 @@ import { scheduleOutdated } from './TeamsPage';
 import { assignPlayDay, dayCounts, matchDay, matchDayRound } from '../lib/playDay';
 import { palestineDateTime, parseMatchTime } from '../lib/matchTime';
 import { teamName } from '../lib/tournament';
+import { assertAvailable } from '../lib/availability';
+import { AvailabilityScheduler } from '../components/AvailabilityScheduler';
 
 type StatusFilter = 'all' | 'upcoming' | 'playing' | 'finished';
 
@@ -116,6 +118,7 @@ export default function MatchesPage() {
         </div>
         </details>
       </section>
+      <AvailabilityScheduler day={day} />
       <div className="mb-5 flex flex-wrap gap-2" aria-label="أقسام المباريات">
         {([['all', 'المباريات ومواعيدها'], ['upcoming', 'المباريات الجاية'], ['playing', 'تُلعب الآن'], ['finished', 'المباريات اللي انلعبت']] as const).map(([key, label]) => (
           <button key={key} className={`btn ${status === key ? 'btn-primary' : 'btn-ghost'}`} aria-pressed={status === key} onClick={() => setStatus(key)}>{label}</button>
@@ -212,6 +215,7 @@ function ScheduleModal({ match, day, round, onClose }: { match: Match; day: stri
       const ok = apply(current => {
         const currentMatch = current.matches.find(m => m.id === match.id);
         if (!currentMatch || isFinished(currentMatch) || currentMatch.status === 'playing') throw new Error('لا يمكن تعديل موعد مباراة بدأت أو انتهت.');
+        assertAvailable(current.teams, currentMatch, date);
         const next = match.stage === 'group' ? assignPlayDay(current, [match.id], date, slot) : current;
         return withLog({ ...next, matches: next.matches.map(m => m.id === match.id ? { ...m, playDay: date, scheduledAt, dayRound: m.stage === 'group' ? slot : null } : m) }, 'تعديل موعد مباراة');
       }, 'تعديل موعد مباراة');

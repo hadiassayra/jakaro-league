@@ -1,6 +1,7 @@
 import type { Match, Tournament } from './types';
 import { isFinished } from './standings';
 import { withLog } from './tournament';
+import { assertAvailable } from './availability';
 
 export function matchDay(m: Match): string | null {
   return m.playDay ?? (m.scheduledAt ? new Intl.DateTimeFormat('sv-SE', { timeZone: 'Asia/Hebron' }).format(m.scheduledAt) : null);
@@ -23,6 +24,7 @@ export function assignPlayDay(t: Tournament, ids: string[], day: string | null, 
   const matches = t.matches.map(m => {
     if (!ids.includes(m.id) || m.stage !== 'group') return m;
     if (isFinished(m) || m.status === 'playing') throw new Error('لا يمكن نقل مباراة بدأت أو انتهت إلى يوم آخر.');
+    if (day) assertAvailable(t.teams, m, day);
     // A changed date clears the old time so the card never shows a conflicting date.
     return { ...m, playDay: day, dayRound: day ? dayRound ?? matchDayRound(m) : null, scheduledAt: matchDay(m) === day ? m.scheduledAt : null };
   });

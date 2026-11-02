@@ -1,11 +1,13 @@
 export type GroupId = 'A' | 'B';
 export const GROUPS: GroupId[] = ['A', 'B'];
+export type Weekday = 0 | 1 | 2 | 3 | 4 | 5 | 6;
 
 export interface Team {
   id: string;
   logo?: string | null;
   pointsAdjustment?: number;
   pointsAdjustmentReason?: string;
+  availableDays?: Weekday[];
   name: string;
   player1: string;
   player2: string;

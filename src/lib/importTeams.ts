@@ -1,4 +1,5 @@
-import type { GroupId } from './types';
+import type { GroupId, Team, Weekday } from './types';
+import { normalizeName, parseAvailableDays } from './availability';
 
 export interface ParsedTeamRow {
   rowNumber: number; // 1-based row in the sheet (header = 1)
@@ -6,7 +7,8 @@ export interface ParsedTeamRow {
   player1: string;
   player2: string;
   group: GroupId | null;
-  issues: ('empty' | 'duplicate' | 'missingPlayers' | 'badGroup')[];
+  availableDays?: Weekday[];
+  issues: ('empty' | 'duplicate' | 'missingPlayers' | 'badGroup' | 'badDays' | 'renamedDuplicate')[];
 }
 
 export interface ParseResult {
@@ -31,9 +33,16 @@ const HEADERS = {
   player1: ['اللاعب 1', 'اللاعب1', 'لاعب 1', 'اللاعب الاول', 'player 1', 'player1', 'p1'],
   player2: ['اللاعب 2', 'اللاعب2', 'لاعب 2', 'اللاعب الثاني', 'player 2', 'player2', 'p2'],
   group: ['المجموعه', 'مجموعه', 'group', 'grp'],
+  members: ['اسم اعضاء الفريق', 'اعضاء الفريق', 'اسماء اللاعبين', 'members', 'players'],
 };
 
-export const TEMPLATE_HEADERS = ['اسم الفريق', 'اللاعب 1', 'اللاعب 2', 'المجموعة'];
+export const TEMPLATE_HEADERS = ['اسم الفريق', 'اللاعب 1', 'اللاعب 2', 'المجموعة', 'الأيام المناسبة'];
+
+export function splitMembers(value: string): [string, string] {
+  const parts = value.trim().split(/\s*(?:\/|\+|،|,|\band\b)\s*|\s+و\s+/i).filter(Boolean);
+  if (parts.length !== 2) return [value.trim(), ''];
+  return [parts[0], norm(parts[1]) === 'فردي' ? '' : parts[1]];
+}
 
 export function parseGroup(v: unknown): GroupId | null | 'bad' {
   const s = norm(v);
@@ -68,14 +77,21 @@ export function parseTeamRows(raw: unknown[][]): ParseResult {
     body = raw;
   }
   const hasGroupColumn = cols.group !== -1;
+  const membersCol = headerFound ? findCol(header, HEADERS.members) : -1;
+  const daysCol = headerFound ? header.findIndex(h => h.includes('ايام') || ['available days', 'availability', 'days'].includes(h)) : -1;
+  const nameCounts = new Map<string, number>();
+  for (const row of body) { const key = norm(row[cols.name]); nameCounts.set(key, (nameCounts.get(key) ?? 0) + 1); }
   const seen = new Map<string, number>();
   const rows: ParsedTeamRow[] = body.map((r, i) => {
     const get = (c: number) => (c === -1 ? '' : String(r?.[c] ?? '').trim());
-    const name = get(cols.name);
-    const player1 = get(cols.player1);
-    const player2 = get(cols.player2);
+    let name = get(cols.name);
+    const members = get(membersCol);
+    const [player1, player2] = membersCol !== -1 ? splitMembers(members) : [get(cols.player1), get(cols.player2)];
     const g = hasGroupColumn ? parseGroup(r?.[cols.group]) : null;
     const issues: ParsedTeamRow['issues'] = [];
+    if (members && (nameCounts.get(norm(name)) ?? 0) > 1) { name = `${name} (${members})`; issues.push('renamedDuplicate'); }
+    const available = daysCol === -1 ? null : parseAvailableDays(r?.[daysCol]);
+    if (available?.invalid.length) issues.push('badDays');
     if (!name && !player1 && !player2) issues.push('empty');
     else {
       const key = norm(name);
@@ -91,6 +107,7 @@ export function parseTeamRows(raw: unknown[][]): ParseResult {
       player1,
       player2,
       group: g === 'bad' ? null : g,
+      ...(available ? { availableDays: available.days } : {}),
       issues,
     };
   });
@@ -100,6 +117,19 @@ export function parseTeamRows(raw: unknown[][]): ParseResult {
 /** Rows that should be imported by default (not empty, not duplicate) */
 export function importableRows(rows: ParsedTeamRow[]): ParsedTeamRow[] {
   return rows.filter((r) => !r.issues.includes('empty') && !r.issues.includes('duplicate'));
+}
+
+/** Reuse current ids, logos and corrections when previewing a replacement roster. */
+export function draftTeamsFromRows(rows: ParsedTeamRow[], existing: Team[]): Team[] {
+  const used = new Set<string>();
+  return importableRows(rows).map(row => {
+    const matches = existing.filter(t => normalizeName(t.name) === normalizeName(row.name));
+    const old = matches.length === 1 && !used.has(matches[0].id) ? matches[0] : undefined;
+    const id = old?.id ?? `availability_${row.rowNumber}_${normalizeName(row.name).replace(/[^\p{L}\p{N}]/gu, '_')}`;
+    used.add(id);
+    const keepSeparatedPlayers = !row.player2 && old?.player1 && old?.player2;
+    return { ...old, id, name: row.name, player1: keepSeparatedPlayers ? old.player1 : row.player1 || old?.player1 || '', player2: row.player2 || old?.player2 || '', group: old?.group ?? row.group, availableDays: row.availableDays ?? old?.availableDays };
+  });
 }
 
 /** Random balanced split into two groups */

@@ -9,6 +9,7 @@ import { importableRows, parseTeamRows, type ParsedTeamRow } from '../lib/import
 import { downloadTemplate, readSheet } from '../lib/excel';
 import { groupLabel } from '../components/StandingsTable';
 import { processTeamLogo } from '../lib/imageColors';
+import { WEEKDAYS, daysLabel } from '../lib/availability';
 import { Empty, Field, MarbleLoader, Modal, SectionTitle, TeamMarble } from '../components/ui';
 
 export function scheduleOutdated(t: Tournament): boolean {
@@ -28,6 +29,8 @@ const ISSUE_TEXT: Record<ParsedTeamRow['issues'][number], string> = {
   duplicate: 'اسم مكرر',
   missingPlayers: 'لاعب ناقص',
   badGroup: 'مجموعة غير معروفة',
+  badDays: 'أيام غير معروفة',
+  renamedDuplicate: 'اسم متكرر؛ تم تمييزه باللاعبين',
 };
 
 function TeamForm({ team, onClose }: { team: Team | null; onClose: () => void }) {
@@ -82,6 +85,13 @@ function TeamForm({ team, onClose }: { team: Team | null; onClose: () => void })
           <input className="input" value={form.player2} onChange={(e) => set('player2', e.target.value)} />
         </Field>
       </div>
+      <fieldset>
+        <legend className="mb-2 text-sm font-bold">الأيام المناسبة للفريق</legend>
+        <div className="flex flex-wrap gap-2">{WEEKDAYS.map(day => <label key={day.id} className="chip gap-2 bg-ink/5 px-3 py-2">
+          <input type="checkbox" checked={form.availableDays?.includes(day.id) ?? false} onChange={e => setForm(current => ({ ...current, availableDays: e.target.checked ? [...(current.availableDays ?? []), day.id] : current.availableDays?.filter(d => d !== day.id) }))} />{day.label}
+        </label>)}</div>
+        <p className="mt-1 text-xs text-ink/55">تركها فارغة يعني أن الأيام غير محددة، ولن تُجدول مبارياته تلقائياً.</p>
+      </fieldset>
       <Field label="المجموعة">
         <select className="input" value={form.group ?? ''} onChange={(e) => set('group', e.target.value || null)}>
           <option value="">بدون (تُحدد بالقرعة)</option>
@@ -147,7 +157,7 @@ function ImportDialog({ open, onClose }: { open: boolean; onClose: () => void })
     const existing = new Set(t.teams.map((x) => x.name.trim()));
     const newTeams: Team[] = chosen
       .filter((r) => mode === 'replace' || !existing.has(r.name.trim()))
-      .map((r) => ({ id: uid('team'), name: r.name, player1: r.player1, player2: r.player2, group: r.group }));
+      .map((r) => ({ id: uid('team'), name: r.name, player1: r.player1, player2: r.player2, group: r.group, availableDays: r.availableDays }));
     apply(
       (x) =>
         withLog(
@@ -170,7 +180,7 @@ function ImportDialog({ open, onClose }: { open: boolean; onClose: () => void })
         <div className="space-y-4">
           <p className="text-ink/75">
             الأعمدة المتوقعة: <b>اسم الفريق</b>، <b>اللاعب 1</b>، <b>اللاعب 2</b>، و<b>المجموعة</b> (اختياري: A/B أو أ/ب). يدعم ملفات
-            ‎.xlsx و ‎.csv.
+            ‎.xlsx و ‎.csv، وشيت ردود التسجيل مع عمود الأيام المناسبة.
           </p>
           <label className="flex cursor-pointer flex-col items-center gap-3 rounded-2xl border-2 border-dashed border-ink/25 p-8 text-center hover:border-accent">
             <span className="text-5xl">📄</span>
@@ -208,6 +218,7 @@ function ImportDialog({ open, onClose }: { open: boolean; onClose: () => void })
                   <th className="p-2 text-start">اللاعب 2</th>
                   <th className="p-2 text-start">المجموعة</th>
                   <th className="p-2 text-start">ملاحظات</th>
+                  <th className="p-2 text-start">الأيام</th>
                 </tr>
               </thead>
               <tbody>
@@ -243,6 +254,7 @@ function ImportDialog({ open, onClose }: { open: boolean; onClose: () => void })
                           ))}
                         </span>
                       </td>
+                      <td className="p-2">{daysLabel(r.availableDays)}</td>
                     </tr>
                   );
                 })}

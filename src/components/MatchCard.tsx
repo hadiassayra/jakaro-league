@@ -6,6 +6,7 @@ import { koRoundLabel } from '../lib/knockout';
 import { matchDayRound } from '../lib/playDay';
 import { Marble, TeamMarble } from './ui';
 import { CardsBadge } from './CardsBadge';
+import { commonDays, daysLabel } from '../lib/availability';
 
 export function useNow(intervalMs = 1000) {
   const [now, setNow] = useState(Date.now());
@@ -74,6 +75,8 @@ export function MatchCard({
   const done = isFinished(m);
   const live = !done && m.status === 'playing';
   const ko = t.matches.filter(x => x.stage === 'knockout');
+  const a = t.teams.find(team => team.id === m.teamA), b = t.teams.find(team => team.id === m.teamB);
+  const shared = a && b ? commonDays(a, b) : [];
   const clickable = !!onOpen && !!m.teamA && !!m.teamB;
   const Tag = clickable ? 'button' : 'div';
   const team = (id: string | null) => {
@@ -109,6 +112,7 @@ export function MatchCard({
       <span>{date}{m.playDay ? ` · ${matchDayRound(m) === 1 ? 'الجولة الأولى' : 'الجولة الثانية'}` : ''}</span>
       {m.table != null && <span>طاولة {m.table}</span>}
     </div>
+    {!done && (a?.availableDays || b?.availableDays) && <div className={`fixture-footer ${shared.length ? '' : 'text-loss'}`}>{shared.length ? `أيام مشتركة: ${daysLabel(shared)}` : !a?.availableDays?.length || !b?.availableDays?.length ? 'أيام أحد الفريقين غير محددة' : 'لا يوم مشترك — يحتاج اتفاقاً إضافياً'}</div>}
     {m.forfeit ? <div className="fixture-result font-bold text-loss">خسارة مباشرة: {teamName(t, m.forfeit.teamId)} — بطاقة حمراء</div> : done && <div className="fixture-result"><span>كرات الخاسر المتبقية</span><MarblesLeft n={m.loserMarbles ?? 0} max={t.settings.maxMarbles} size={big ? 15 : 9} /><strong>{m.loserMarbles ?? '—'}</strong></div>}
   </Tag>;
 }

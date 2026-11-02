@@ -7,6 +7,7 @@ import { TEMPLATE_HEADERS } from './importTeams';
 import { allStandings, teamName } from './tournament';
 import { koMatches, koRoundLabel } from './knockout';
 import { isFinished } from './standings';
+import { daysLabel } from './availability';
 
 function rtlBook(XLSX: X): XLSXTypes.WorkBook {
   const wb = XLSX.utils.book_new();
@@ -27,8 +28,8 @@ export async function downloadTemplate() {
     XLSX,
     wb,
     'الفرق',
-    [TEMPLATE_HEADERS, ['الصقور', 'أحمد', 'خالد', 'أ'], ['النمور', 'محمد', 'سعد', 'ب']],
-    [24, 18, 18, 10],
+    [TEMPLATE_HEADERS, ['الصقور', 'أحمد', 'خالد', 'أ', 'السبت، الاثنين'], ['النمور', 'محمد', 'سعد', 'ب', 'الثلاثاء، الخميس']],
+    [24, 18, 18, 10, 35],
   );
   XLSX.writeFile(wb, 'قالب-فرق-جاكرو.xlsx');
 }
@@ -117,8 +118,8 @@ export async function exportTournament(t: Tournament) {
     XLSX,
     wb,
     'الفرق',
-    [TEMPLATE_HEADERS, ...t.teams.map((tm) => [tm.name, tm.player1, tm.player2, gName(tm.group)])],
-    [24, 18, 18, 10],
+    [TEMPLATE_HEADERS, ...t.teams.map((tm) => [tm.name, tm.player1, tm.player2, gName(tm.group), tm.availableDays?.length ? daysLabel(tm.availableDays) : ''])],
+    [24, 18, 18, 10, 35],
   );
   addSheet(XLSX, wb, 'البطاقات والعقوبات', [
     ['المباراة', 'الفريق', 'المرحلة', 'الصفراء', 'الحمراء', 'خصم النقاط', 'خسارة مباشرة'],
