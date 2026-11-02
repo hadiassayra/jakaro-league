@@ -17,6 +17,7 @@ import { AvailabilityScheduler } from '../components/AvailabilityScheduler';
 import { ManualMatchModal } from '../components/ManualMatchModal';
 import { PublicDaysControl } from '../components/PublicDaysControl';
 import { deleteGroupMatch } from '../lib/manualMatches';
+import { GroupOpponents } from '../components/GroupOpponents';
 
 type StatusFilter = 'all' | 'upcoming' | 'playing' | 'finished';
 
@@ -24,7 +25,7 @@ export default function MatchesPage() {
   const t = useStore((s) => s.t);
   const apply = useStore((s) => s.apply);
   const [schedule, setSchedule] = useState<Match | null>(null);
-  const [creating, setCreating] = useState(false);
+  const [creating, setCreating] = useState<{ teamA?: string; teamB?: string } | null>(null);
   const [open, setOpen] = useState<Match | null>(null);
   const [group, setGroup] = useState<GroupId | 'all'>('all');
   const [status, setStatus] = useState<StatusFilter>('all');
@@ -90,7 +91,7 @@ export default function MatchesPage() {
         sub={gm.length ? `${gm.filter(isFinished).length}/${gm.length} مباراة مجموعات منتهية` : undefined}
         actions={
           <div className="flex flex-wrap gap-2">
-          <button className="btn btn-primary" disabled={t.groupsLocked || t.teams.length < 2} onClick={() => setCreating(true)}>＋ إنشاء مباراة</button>
+          <button className="btn btn-primary" disabled={t.groupsLocked || t.teams.length < 2} onClick={() => setCreating({})}>＋ إنشاء مباراة</button>
           <details className="relative">
             <summary className="btn btn-ghost cursor-pointer">إدارة الجدول</summary>
             <div className="absolute end-0 z-20 mt-2 flex w-64 flex-col gap-2 rounded-xl border border-ink/15 bg-surface p-3 shadow-xl">
@@ -132,6 +133,7 @@ export default function MatchesPage() {
         </details>
       </section>
       <AvailabilityScheduler day={day} />
+      <GroupOpponents t={t} onSchedule={(teamA, teamB) => setCreating({ teamA, teamB })} />
       <div className="mb-5 flex flex-wrap gap-2" aria-label="أقسام المباريات">
         {([['all', 'المباريات ومواعيدها'], ['upcoming', 'المباريات الجاية'], ['playing', 'تُلعب الآن'], ['finished', 'المباريات اللي انلعبت']] as const).map(([key, label]) => (
           <button key={key} className={`btn ${status === key ? 'btn-primary' : 'btn-ghost'}`} aria-pressed={status === key} onClick={() => setStatus(key)}>{label}</button>
@@ -207,7 +209,7 @@ export default function MatchesPage() {
         })}
       </div>
       {schedule && <ScheduleModal key={schedule.id} match={schedule} day={day} round={dayRound} onClose={() => setSchedule(null)} />}
-      {creating && <ManualMatchModal day={day} round={dayRound} onClose={() => setCreating(false)} />}
+      {creating && <ManualMatchModal day={day} round={dayRound} initialTeamA={creating.teamA} initialTeamB={creating.teamB} onClose={() => setCreating(null)} />}
       <ResultModal match={open} onClose={() => setOpen(null)} />
     </div>
   );

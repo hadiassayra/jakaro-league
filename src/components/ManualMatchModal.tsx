@@ -5,10 +5,10 @@ import { saveManualMatch } from '../lib/manualMatches';
 import { daysLabel } from '../lib/availability';
 import { Modal } from './ui';
 
-export function ManualMatchModal({ day, round, onClose }: { day: string; round: 1 | 2; onClose: () => void }) {
+export function ManualMatchModal({ day, round, onClose, initialTeamA = '', initialTeamB = '' }: { day: string; round: 1 | 2; onClose: () => void; initialTeamA?: string; initialTeamB?: string }) {
   const t = useStore(s => s.t);
   const apply = useStore(s => s.apply);
-  const [teamA, setA] = useState(''), [teamB, setB] = useState('');
+  const [teamA, setA] = useState(initialTeamA), [teamB, setB] = useState(initialTeamB);
   const [date, setDate] = useState(day), [time, setTime] = useState('16:00');
   const [slot, setSlot] = useState<1 | 2>(round), [table, setTable] = useState<number | null>(null);
   const [error, setError] = useState('');

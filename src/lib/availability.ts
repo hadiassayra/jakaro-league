@@ -119,7 +119,7 @@ export function planByAvailability(t: Tournament, start: string, options: { hori
   if (!/^\d{4}-\d{2}-\d{2}$/.test(start) || !Number.isFinite(Date.parse(`${start}T12:00:00Z`))) throw new Error('اختر تاريخ بداية صحيحاً.');
   if (new Date(`${start}T12:00:00Z`).toISOString().slice(0, 10) !== start) throw new Error('اختر تاريخ بداية صحيحاً.');
   if (t.groupsLocked) throw new Error('نتائج المجموعات معتمدة ومقفلة.');
-  const horizon = options.horizon ?? 120;
+  const horizon = options.horizon ?? 1;
   const team = new Map(t.teams.map(tm => [tm.id, tm]));
   const matches = t.matches.map(m => ({ ...m }));
   const pending = new Set(matches.filter(m => m.stage === 'group' && m.status === 'upcoming' && !m.winnerId && !assignedDate(m) && !availabilityProblem(t.teams, m)).map(m => m.id));

@@ -1,4 +1,5 @@
 import { Link, useParams } from 'react-router-dom';
+import { GroupOpponents } from '../components/GroupOpponents';
 import { useStore } from '../store/useStore';
 import { allStandings, teamName } from '../lib/tournament';
 import { teamResults, countComebacks } from '../lib/stats';
@@ -76,6 +77,7 @@ export default function TeamProfilePage() {
         </div>
       </section>
 
+      <GroupOpponents key={team.id} t={t} teamId={team.id} />
       {path.length > 0 && (
         <section>
           <SectionTitle rank="A" title="المسار في الأدوار الإقصائية" />

@@ -11,6 +11,14 @@ export function matchDayRound(m: Match): 1 | 2 {
   return m.dayRound ?? (m.round % 2 === 1 ? 1 : 2);
 }
 
+/** Remove date assignments only; results, opponents, cards and fixture IDs stay intact. */
+export function clearScheduleExceptDay(t: Tournament, keepDay: string): Tournament {
+  return withLog({ ...t, currentPlayDay: keepDay, matches: t.matches.map(m => {
+    const day = matchDay(m);
+    return day && day !== keepDay ? { ...m, playDay: null, scheduledAt: null, dayRound: null, table: null } : m;
+  }) }, `إزالة مواعيد المباريات باستثناء يوم ${keepDay} مع الاحتفاظ بالمواجهات والنتائج`);
+}
+
 export function dayCounts(t: Tournament, day: string): Map<string, number> {
   const counts = new Map<string, number>();
   t.matches.filter(m => m.stage === 'group' && matchDay(m) === day).forEach(m => {
