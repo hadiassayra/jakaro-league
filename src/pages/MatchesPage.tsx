@@ -18,6 +18,7 @@ import { ManualMatchModal } from '../components/ManualMatchModal';
 import { PublicDaysControl } from '../components/PublicDaysControl';
 import { deleteGroupMatch } from '../lib/manualMatches';
 import { GroupOpponents } from '../components/GroupOpponents';
+import { ReplacementMatchesModal } from '../components/ReplacementMatchesModal';
 
 type StatusFilter = 'all' | 'upcoming' | 'playing' | 'finished';
 
@@ -25,6 +26,7 @@ export default function MatchesPage() {
   const t = useStore((s) => s.t);
   const apply = useStore((s) => s.apply);
   const [schedule, setSchedule] = useState<Match | null>(null);
+  const [replacement, setReplacement] = useState<Match | null>(null);
   const [creating, setCreating] = useState<{ teamA?: string; teamB?: string } | null>(null);
   const [open, setOpen] = useState<Match | null>(null);
   const [group, setGroup] = useState<GroupId | 'all'>('all');
@@ -41,7 +43,11 @@ export default function MatchesPage() {
 
   const cancelMatch = async (m: Match) => {
     if (!await confirmDialog({ title: 'إلغاء المباراة؟', message: `${teamName(t, m.teamA)} × ${teamName(t, m.teamB)} — ستُحذف المباراة من الجدول ورابط الجمهور.${isFinished(m) || m.cards ? ' ستُحذف نتيجتها وبطاقاتها ويُعاد احتساب النقاط.' : ''} يمكنك استرجاعها بزر التراجع.`, confirmText: 'إلغاء المباراة', danger: true })) return;
-    if (apply(x => deleteGroupMatch(x, m.id), 'إلغاء مباراة')) toast('تم إلغاء المباراة');
+    let cancelled: Match | undefined;
+    if (apply(x => { cancelled = x.matches.find(current => current.id === m.id); return deleteGroupMatch(x, m.id); }, 'إلغاء مباراة')) {
+      toast('تم إلغاء المباراة');
+      if (cancelled && matchDay(cancelled)) setReplacement(cancelled);
+    }
   };
 
   const regenerate = async () => {
@@ -210,6 +216,7 @@ export default function MatchesPage() {
       </div>
       {schedule && <ScheduleModal key={schedule.id} match={schedule} day={day} round={dayRound} onClose={() => setSchedule(null)} />}
       {creating && <ManualMatchModal day={day} round={dayRound} initialTeamA={creating.teamA} initialTeamB={creating.teamB} onClose={() => setCreating(null)} />}
+      {replacement && <ReplacementMatchesModal cancelled={replacement} onClose={() => setReplacement(null)} />}
       <ResultModal match={open} onClose={() => setOpen(null)} />
     </div>
   );
