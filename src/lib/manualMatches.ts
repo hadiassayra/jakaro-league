@@ -33,7 +33,7 @@ export function saveManualMatch(t: Tournament, input: ManualMatchInput): Tournam
     table: null, teamA: a.id, teamB: b.id, winnerId: null, loserMarbles: null,
     status: 'upcoming' as const, startedAt: null, finishedAt: null,
   };
-  const next = assignPlayDay({ ...t, matches: existing ? t.matches : [...t.matches, m] }, [m.id], input.day, input.dayRound);
+  const next = assignPlayDay({ ...t, matches: existing ? t.matches : [...t.matches, m] }, [m.id], input.day, input.dayRound, { checkAvailability: false });
   if (input.table !== null && next.matches.some(x => x.id !== m.id && x.table === input.table &&
     matchDay(x) === input.day && (matchDayRound(x) === input.dayRound || x.scheduledAt === scheduledAt))) {
     throw new Error('الطاولة مستخدمة في هذه الجولة أو الساعة. اختر طاولة أخرى.');

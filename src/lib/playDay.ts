@@ -27,12 +27,12 @@ export function dayCounts(t: Tournament, day: string): Map<string, number> {
   return counts;
 }
 
-export function assignPlayDay(t: Tournament, ids: string[], day: string | null, dayRound?: 1 | 2): Tournament {
+export function assignPlayDay(t: Tournament, ids: string[], day: string | null, dayRound?: 1 | 2, options: { checkAvailability?: boolean } = {}): Tournament {
   if (t.groupsLocked) throw new Error('نتائج المجموعات معتمدة ومقفلة.');
   const matches = t.matches.map(m => {
     if (!ids.includes(m.id) || m.stage !== 'group') return m;
     if (isFinished(m) || m.status === 'playing') throw new Error('لا يمكن نقل مباراة بدأت أو انتهت إلى يوم آخر.');
-    if (day) assertAvailable(t.teams, m, day);
+    if (day && options.checkAvailability !== false) assertAvailable(t.teams, m, day);
     // A changed date clears the old time so the card never shows a conflicting date.
     return { ...m, playDay: day, dayRound: day ? dayRound ?? matchDayRound(m) : null, scheduledAt: matchDay(m) === day ? m.scheduledAt : null };
   });

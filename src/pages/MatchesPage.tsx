@@ -12,7 +12,6 @@ import { scheduleOutdated } from './TeamsPage';
 import { assignPlayDay, dayCounts, matchDay, matchDayRound } from '../lib/playDay';
 import { palestineDateTime, parseMatchTime } from '../lib/matchTime';
 import { teamName } from '../lib/tournament';
-import { assertAvailable } from '../lib/availability';
 import { AvailabilityScheduler } from '../components/AvailabilityScheduler';
 import { ManualMatchModal } from '../components/ManualMatchModal';
 import { PublicDaysControl } from '../components/PublicDaysControl';
@@ -35,7 +34,7 @@ export default function MatchesPage() {
   const [dayRound, setDayRound] = useState<1 | 2>(1);
   const day = t.currentPlayDay ?? new Intl.DateTimeFormat('sv-SE', { timeZone: 'Asia/Hebron' }).format(new Date());
   const counts = dayCounts(t, day);
-  const assign = (ids: string[], target: string | null) => apply(x => assignPlayDay(x, ids, target, dayRound), 'تعديل مباريات يوم اللعب');
+  const assign = (ids: string[], target: string | null) => apply(x => assignPlayDay(x, ids, target, dayRound, { checkAvailability: false }), 'تعديل مباريات يوم اللعب');
 
   const gm = t.matches.filter((m) => m.stage === 'group');
   const ungrouped = t.teams.filter((x) => !x.group).length;
@@ -239,8 +238,7 @@ function ScheduleModal({ match, day, round, onClose }: { match: Match; day: stri
       const ok = apply(current => {
         const currentMatch = current.matches.find(m => m.id === match.id);
         if (!currentMatch || isFinished(currentMatch) || currentMatch.status === 'playing') throw new Error('لا يمكن تعديل موعد مباراة بدأت أو انتهت.');
-        assertAvailable(current.teams, currentMatch, date);
-        const next = match.stage === 'group' ? assignPlayDay(current, [match.id], date, slot) : current;
+        const next = match.stage === 'group' ? assignPlayDay(current, [match.id], date, slot, { checkAvailability: false }) : current;
         return withLog({ ...next, matches: next.matches.map(m => m.id === match.id ? { ...m, playDay: date, scheduledAt, dayRound: m.stage === 'group' ? slot : null } : m) }, 'تعديل موعد مباراة');
       }, 'تعديل موعد مباراة');
       if (ok) { toast('تم حفظ موعد المباراة'); onClose(); }

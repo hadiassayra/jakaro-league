@@ -33,19 +33,31 @@ describe('manual fixture management', () => {
     const added = recreated.matches.find(x => !deleted.matches.some(old => old.id === x.id))!;
     expect(added).toMatchObject({ teamA: 'a', teamB: 'b', status: 'upcoming', winnerId: null, playDay: input.day });
   });
-  it('rejects invalid pairings, locked groups, unavailable days, and active/finished duplicates', () => {
+  it('rejects invalid pairings, locked groups, and active/finished duplicates', () => {
     const t = tournament();
     for (const teamB of ['a', 'e', 'missing']) expect(() => saveManualMatch(t, { ...input, teamB })).toThrow();
     expect(() => saveManualMatch({ ...t, groupsLocked: true }, input)).toThrow();
     expect(() => deleteGroupMatch({ ...t, groupsLocked: true }, t.matches[0].id)).toThrow();
-    t.teams[0].availableDays = [0];
-    expect(() => saveManualMatch(t, input)).toThrow();
-    delete t.teams[0].availableDays;
     const next = saveManualMatch(t, input);
     const m = next.matches.find(x => x.playDay)!;
     m.status = 'playing';
     expect(() => saveManualMatch(next, input)).toThrow();
     expect(() => saveManualMatch(recordResult(next, m.id, 'a', 2), input)).toThrow();
+  });
+  it('lets the admin create and reschedule games outside either team’s declared days without changing availability', () => {
+    const t = tournament();
+    t.teams[0].availableDays = [0];
+    t.teams[1].availableDays = [1];
+    const original = structuredClone(t);
+    const existing = saveManualMatch(t, input);
+    expect(existing.matches.find(m => m.playDay)?.playDay).toBe(input.day);
+    const pairing = t.matches.find(m => (m.teamA === 'a' && m.teamB === 'b') || (m.teamA === 'b' && m.teamB === 'a'))!;
+    const missing = deleteGroupMatch(t, pairing.id);
+    const created = saveManualMatch(missing, input);
+    expect(created.matches).toHaveLength(t.matches.length);
+    expect(created.teams).toEqual(original.teams);
+    expect(t).toEqual(original);
+    expect(() => saveManualMatch(existing, { ...input, teamB: 'c', table: null })).toThrow();
   });
   it('enforces team rounds, the two games per day limit, and table conflicts', () => {
     const first = saveManualMatch(tournament(), input);

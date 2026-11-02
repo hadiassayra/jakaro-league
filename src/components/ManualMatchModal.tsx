@@ -30,7 +30,7 @@ export function ManualMatchModal({ day, round, onClose, initialTeamA = '', initi
     <div className="grid grid-cols-2 gap-3"><label className="text-sm font-bold">اليوم<input className="input mt-1" type="date" required value={date} onChange={e => setDate(e.target.value)} /></label><label className="text-sm font-bold">الساعة بتوقيت فلسطين<input className="input mt-1" type="time" dir="ltr" required value={time} onChange={e => setTime(e.target.value)} /></label></div>
     <label className="block text-sm font-bold">الجولة<select className="input mt-1" value={slot} onChange={e => setSlot(Number(e.target.value) as 1 | 2)}><option value={1}>الجولة الأولى من اليوم</option><option value={2}>الجولة الثانية من اليوم</option></select></label>
     <label className="block text-sm font-bold">الطاولة<select className="input mt-1" value={table ?? ''} onChange={e => setTable(e.target.value ? Number(e.target.value) : null)}><option value="">بدون تحديد</option>{Array.from({ length: t.settings.tablesCount }, (_, i) => <option key={i + 1} value={i + 1}>طاولة {i + 1}</option>)}</select></label>
-    <p className="text-xs text-ink/60">مباراة واحدة لكل فريق بالجولة، وبحد أقصى مباراتين باليوم، حسب أيام توفر الفريقين.</p>
+    <p className="text-xs text-ink/60">اختر أي يوم تريده؛ أيام توفر الفرق للاسترشاد فقط في الإدخال اليدوي. مباراة واحدة لكل فريق بالجولة، وبحد أقصى مباراتين باليوم.</p>
     {error && <p role="alert" className="text-sm text-loss">{error}</p>}
     <div className="flex gap-2"><button className="btn btn-primary" disabled={t.groupsLocked || (!!existing && existing.status !== 'upcoming')}>{existing ? 'حفظ موعد المواجهة' : 'إنشاء المباراة'}</button><button type="button" className="btn btn-ghost" onClick={onClose}>إلغاء</button></div>
   </form></Modal>;
