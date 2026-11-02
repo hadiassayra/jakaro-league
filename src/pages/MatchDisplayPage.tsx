@@ -10,6 +10,7 @@ import { isFinished } from '../lib/standings';
 import { matchDay, matchDayRound } from '../lib/playDay';
 import type { Match } from '../lib/types';
 import { BackButton } from '../components/BackButton';
+import { formatMatchTime } from '../lib/matchTime';
 
 export default function MatchDisplayPage() {
   const { t, remote, status } = useViewTournament();
@@ -51,7 +52,7 @@ export default function MatchDisplayPage() {
         <BackButton />
         <BrandLogos src={t.settings.logo} />
         <div className="flex-1"><p className="text-xs font-bold tracking-widest text-primary-ink">مركز المباريات</p><h1 className="text-3xl sm:text-4xl">{t.settings.name}</h1></div>
-        <div className="text-end"><p className="text-2xl font-bold tabular-nums" dir="ltr">{new Date(now).toLocaleTimeString('en-GB', { timeZone: 'Asia/Hebron', hour: '2-digit', minute: '2-digit' })}</p><p className="text-xs text-ink/50">توقيت فلسطين</p></div>
+        <div className="text-end"><p className="text-2xl font-bold tabular-nums" dir="ltr">{formatMatchTime(now)}</p><p className="text-xs text-ink/50">توقيت فلسطين</p></div>
         <button className="btn btn-ghost btn-sm" onClick={fullScreen}>⛶ ملء الشاشة</button>
         <Link className="btn btn-ghost btn-sm" to={`/live${query ? `?${query}` : ''}`}>الترتيب والنتائج</Link>
       </div>

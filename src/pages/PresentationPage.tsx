@@ -1,5 +1,6 @@
 import { AnimatePresence, motion } from 'framer-motion';
 import { publicMatches } from '../lib/publicMatches';
+import { formatMatchTime } from '../lib/matchTime';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import type { GroupId, QualStatus, Tournament } from '../lib/types';
@@ -85,7 +86,7 @@ function useReveals(t: Tournament | null) {
 function Clock() {
   const now = useNow(10000);
   return (
-    <span className="tabular-nums">{new Intl.DateTimeFormat('ar', { hour: 'numeric', minute: '2-digit' }).format(now)}</span>
+    <span className="tabular-nums" dir="ltr">{formatMatchTime(now)}</span>
   );
 }
 

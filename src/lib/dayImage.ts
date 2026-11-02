@@ -1,6 +1,6 @@
 import type { Match, Tournament } from './types';
 import { matchDay, matchDayRound } from './playDay';
-import { palestineDateTime } from './matchTime';
+import { formatMatchTime } from './matchTime';
 import { isFinished } from './standings';
 import fictionLogo from '../assets/brand/fiction-badge.png';
 import tmaxLogo from '../assets/brand/tmax-energy-drink.svg';
@@ -90,7 +90,7 @@ export async function downloadDayImage(t: Tournament, day: string): Promise<void
       if (status) text(status, right ? x + w - 124 : x + 124, y + 149, 16, cards?.red ? '#bb3145' : '#66718b', right ? 'right' : 'left', 295);
     };
     team(m.teamA, true); team(m.teamB, false);
-    text(m.scheduledAt ? palestineDateTime(m.scheduledAt).slice(11) : 'الوقت لاحقاً', x + w / 2, y + 58, 23, '#10208e');
+    text(m.scheduledAt ? formatMatchTime(m.scheduledAt) : 'الوقت لاحقاً', x + w / 2, y + 58, 23, '#10208e');
     text('×', x + w / 2, y + 94, 26, '#66718b');
     text(isFinished(m) ? 'انتهت' : m.status === 'playing' ? 'تُلعب الآن' : 'قادمة', x + w / 2, y + 132, 17, m.status === 'playing' ? '#bb3145' : '#66718b');
     if (isFinished(m)) text(`كرات الخاسر: ${m.loserMarbles ?? 0}`, x + w / 2, y + 155, 13, '#66718b');

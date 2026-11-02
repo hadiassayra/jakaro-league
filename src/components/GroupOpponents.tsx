@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import type { Tournament } from '../lib/types';
 import { groupOpponents } from '../lib/opponents';
 import { matchDay } from '../lib/playDay';
-import { palestineDateTime } from '../lib/matchTime';
+import { formatMatchTime } from '../lib/matchTime';
 import { TeamMarble } from './ui';
 
 export function GroupOpponents({ t, teamId, onSchedule }: { t: Tournament; teamId?: string; onSchedule?: (a: string, b: string) => void }) {
@@ -19,7 +19,7 @@ export function GroupOpponents({ t, teamId, onSchedule }: { t: Tournament; teamI
     <div className="flex flex-wrap gap-2">{([['all', 'كل الخصوم'], ['played', 'لعب معهم'], ['remaining', 'لم يلعب معهم']] as const).map(([value, label]) => <button key={value} className={`btn btn-sm ${filter === value ? 'btn-primary' : 'btn-ghost'}`} aria-pressed={filter === value} onClick={() => setFilter(value)}>{label}</button>)}</div>
     <div className="max-h-96 divide-y divide-ink/10 overflow-y-auto">{opponents.filter(x => filter === 'all' || (filter === 'played' ? x.status === 'played' : x.status !== 'played')).map(x => <div key={x.team.id} className="flex flex-wrap items-center gap-3 py-3">
       <TeamMarble teams={t.teams} id={x.team.id} size={30} /><Link className="min-w-0 flex-1 font-bold hover:underline" to={`/admin/team/${x.team.id}`}>{x.team.name}</Link>
-      <div className="text-end text-xs"><span className={x.status === 'played' ? 'text-win' : x.status === 'playing' ? 'text-loss' : 'text-ink/65'}>{labels[x.status]}{x.status === 'played' ? x.match?.winnerId === id ? ' · فوز' : ' · خسارة' : ''}</span>{x.match && matchDay(x.match) && <p className="mt-1 text-ink/50">{matchDay(x.match)}{x.match.scheduledAt ? ` · ${palestineDateTime(x.match.scheduledAt).slice(11)}` : ''}</p>}</div>
+      <div className="text-end text-xs"><span className={x.status === 'played' ? 'text-win' : x.status === 'playing' ? 'text-loss' : 'text-ink/65'}>{labels[x.status]}{x.status === 'played' ? x.match?.winnerId === id ? ' · فوز' : ' · خسارة' : ''}</span>{x.match && matchDay(x.match) && <p className="mt-1 text-ink/50">{matchDay(x.match)}{x.match.scheduledAt ? ` · ${formatMatchTime(x.match.scheduledAt)}` : ''}</p>}</div>
       {onSchedule && !t.groupsLocked && x.status !== 'played' && x.status !== 'playing' && <button className="btn btn-ghost btn-sm" onClick={() => onSchedule(id, x.team.id)}>{x.status === 'scheduled' ? 'تعديل الموعد' : 'اختيار لهذا اليوم'}</button>}
     </div>)}</div>
     {!opponents.length && <p className="text-sm text-ink/60">لا توجد فرق أخرى في مجموعة هذا الفريق.</p>}

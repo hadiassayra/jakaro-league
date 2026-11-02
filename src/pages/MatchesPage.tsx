@@ -19,6 +19,7 @@ import { deleteGroupMatch } from '../lib/manualMatches';
 import { GroupOpponents } from '../components/GroupOpponents';
 import { ReplacementMatchesModal } from '../components/ReplacementMatchesModal';
 import { DayImageButton } from '../components/DayImageButton';
+import { Time12Input } from '../components/Time12Input';
 
 type StatusFilter = 'all' | 'upcoming' | 'playing' | 'finished';
 
@@ -265,9 +266,9 @@ function ScheduleModal({ match, day, round, onClose }: { match: Match; day: stri
         <legend className="mb-2 text-sm font-bold">الجولة في هذا اليوم</legend>
         <div className="grid grid-cols-2 gap-2">{([1, 2] as const).map(n => <button key={n} type="button" disabled={locked} aria-pressed={slot === n} className={`btn ${slot === n ? 'btn-primary' : 'btn-ghost'}`} onClick={() => setSlot(n)}>{n === 1 ? 'الجولة الأولى' : 'الجولة الثانية'}</button>)}</div>
       </fieldset>}
-      <label className="block text-sm font-bold">ساعة البداية <span className="font-normal text-ink/50">(اختياري)</span>
-        <input type="time" className="input mt-2" dir="ltr" value={time} onChange={e => setTime(e.target.value)} disabled={locked} />
-      </label>
+      <div className="block text-sm font-bold">ساعة البداية <span className="font-normal text-ink/50">(اختياري)</span>
+        <Time12Input label="ساعة بداية المباراة" value={time} onChange={setTime} disabled={locked} />
+      </div>
       <div className="flex flex-wrap gap-2">{['16:00', '17:00', '18:00', '19:00', '20:00'].map(value => <button key={value} type="button" disabled={locked} aria-pressed={time === value} className={`btn btn-sm ${time === value ? 'btn-primary' : 'btn-ghost'}`} onClick={() => setTime(value)}>{Number(value.slice(0, 2)) - 12}:00 م</button>)}</div>
       <p className="text-xs text-ink/60">جميع المواعيد بتوقيت فلسطين. يمكنك حفظ اليوم والجولة وتحديد الساعة لاحقاً.</p>
       {error && <p role="alert" className="text-sm text-loss">{error}</p>}

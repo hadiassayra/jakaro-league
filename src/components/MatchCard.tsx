@@ -7,6 +7,7 @@ import { matchDayRound } from '../lib/playDay';
 import { Marble, TeamMarble } from './ui';
 import { CardsBadge } from './CardsBadge';
 import { commonDays, daysLabel } from '../lib/availability';
+import { formatMatchTime } from '../lib/matchTime';
 
 export function useNow(intervalMs = 1000) {
   const [now, setNow] = useState(Date.now());
@@ -102,7 +103,7 @@ export function MatchCard({
       {team(m.teamA)}
       <div className="fixture-center">
         {done ? <><span className="text-2xl" aria-hidden="true">🏆</span><span className="fixture-outcome">النتيجة النهائية</span><span className="text-xs text-ink/60">فوز / خسارة</span></> : live ? <><span className="fixture-versus">VS</span>{m.startedAt ? <MatchTimer startedAt={m.startedAt} limitMin={t.settings.matchTimeLimitMin} big={big} /> : <span className="text-xs text-loss">قيد اللعب</span>}</> : <>
-          <span className="fixture-kickoff" dir="ltr">{m.scheduledAt ? new Date(m.scheduledAt).toLocaleTimeString('en-GB', { timeZone: 'Asia/Hebron', hour: '2-digit', minute: '2-digit', hourCycle: 'h23' }) : '— : —'}</span>
+          <span className="fixture-kickoff" dir="ltr">{m.scheduledAt ? formatMatchTime(m.scheduledAt) : '— : —'}</span>
           <span className="fixture-timezone">{m.scheduledAt ? 'بتوقيت فلسطين' : 'الساعة لم تُحدد'}</span>
         </>}
       </div>

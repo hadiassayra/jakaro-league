@@ -1,7 +1,8 @@
 import { useMemo, useState } from 'react';
 import type { Match } from '../lib/types';
 import { matchDay, matchDayRound } from '../lib/playDay';
-import { palestineDateTime } from '../lib/matchTime';
+import { palestineDateTime, formatTime12 } from '../lib/matchTime';
+import { Time12Input } from './Time12Input';
 import { applyReplacement, replacementSuggestions } from '../lib/replacementMatches';
 import { teamName } from '../lib/tournament';
 import { useStore } from '../store/useStore';
@@ -16,8 +17,8 @@ export function ReplacementMatchesModal({ cancelled, onClose }: { cancelled: Mat
   const slot = useMemo(() => ({ day: matchDay(cancelled)!, time, dayRound: matchDayRound(cancelled), table: cancelled.table }), [cancelled, time]);
   const suggestions = useMemo(() => replacementSuggestions(t, cancelled, slot), [t, cancelled, slot]);
   return <Modal open onClose={onClose} title="مواجهات بديلة للموعد الشاغر" wide>
-    <div className="mb-4 rounded-xl bg-accent/15 p-4"><p className="font-bold">{slot.day} · الجولة {slot.dayRound === 1 ? 'الأولى' : 'الثانية'}{time ? ` · ${time} بتوقيت فلسطين` : ''}{slot.table ? ` · طاولة ${slot.table}` : ''}</p><p className="mt-2 text-sm text-ink/65">تم إلغاء {teamName(t, cancelled.teamA)} × {teamName(t, cancelled.teamB)}. اختر مواجهة متبقية لاعتمادها في هذا الموعد.</p></div>
-    {!cancelled.scheduledAt && <label className="mb-4 block text-sm font-bold">حدّد ساعة البداية لعرض البدائل<input type="time" className="input mt-2" dir="ltr" value={time} onChange={e => setTime(e.target.value)} /></label>}
+    <div className="mb-4 rounded-xl bg-accent/15 p-4"><p className="font-bold">{slot.day} · الجولة {slot.dayRound === 1 ? 'الأولى' : 'الثانية'}{time ? ` · ${formatTime12(time)} بتوقيت فلسطين` : ''}{slot.table ? ` · طاولة ${slot.table}` : ''}</p><p className="mt-2 text-sm text-ink/65">تم إلغاء {teamName(t, cancelled.teamA)} × {teamName(t, cancelled.teamB)}. اختر مواجهة متبقية لاعتمادها في هذا الموعد.</p></div>
+    {!cancelled.scheduledAt && <div className="mb-4 block text-sm font-bold">حدّد ساعة البداية لعرض البدائل<Time12Input label="وقت المواجهة البديلة" value={time} onChange={setTime} /></div>}
     <p className="mb-3 text-sm text-ink/60">الاقتراحات تراعي أيام توفر الفريقين، مباراة واحدة في الجولة ومباراتين باليوم كحد أقصى. تُعرض مواجهات المجموعة نفسها أولاً، ولا تُنقل المباريات المحجوزة سابقاً.</p>
     {error && <p role="alert" className="mb-3 text-sm text-loss">{error}</p>}
     {time && <p className="mb-2 text-sm font-bold">{suggestions.length} مواجهة متاحة</p>}

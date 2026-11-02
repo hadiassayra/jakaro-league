@@ -4,6 +4,7 @@ import { toast } from '../store/ui';
 import { saveManualMatch } from '../lib/manualMatches';
 import { daysLabel } from '../lib/availability';
 import { Modal } from './ui';
+import { Time12Input } from './Time12Input';
 
 export function ManualMatchModal({ day, round, onClose, initialTeamA = '', initialTeamB = '' }: { day: string; round: 1 | 2; onClose: () => void; initialTeamA?: string; initialTeamB?: string }) {
   const t = useStore(s => s.t);
@@ -27,7 +28,7 @@ export function ManualMatchModal({ day, round, onClose, initialTeamA = '', initi
     <label className="block text-sm font-bold">الفريق الثاني<select className="input mt-1" required value={teamB} disabled={!a} onChange={e => setB(e.target.value)}><option value="">اختر الفريق</option>{t.teams.filter(x => x.id !== teamA && x.group && x.group === a?.group).map(x => <option key={x.id} value={x.id}>{x.name}</option>)}</select></label>
     {(a || b) && <p className="text-xs text-ink/60">{[a, b].filter(Boolean).map(x => `${x!.name}: ${daysLabel(x!.availableDays)}`).join(' · ')}</p>}
     {existing && <p role="status" className="rounded-xl bg-accent/15 p-3 text-sm">{existing.status === 'upcoming' ? 'المواجهة موجودة في الجدول؛ سيتم حفظ الموعد على نفس المباراة.' : 'هذه المواجهة بدأت أو انتهت، ولا يمكن إنشاء نسخة مكررة منها.'}</p>}
-    <div className="grid grid-cols-2 gap-3"><label className="text-sm font-bold">اليوم<input className="input mt-1" type="date" required value={date} onChange={e => setDate(e.target.value)} /></label><label className="text-sm font-bold">الساعة بتوقيت فلسطين<input className="input mt-1" type="time" dir="ltr" required value={time} onChange={e => setTime(e.target.value)} /></label></div>
+    <div className="grid gap-3 sm:grid-cols-2"><label className="text-sm font-bold">اليوم<input className="input mt-1" type="date" required value={date} onChange={e => setDate(e.target.value)} /></label><div className="text-sm font-bold">الساعة بتوقيت فلسطين<Time12Input label="بداية المباراة" required value={time} onChange={setTime} /></div></div>
     <label className="block text-sm font-bold">الجولة<select className="input mt-1" value={slot} onChange={e => setSlot(Number(e.target.value) as 1 | 2)}><option value={1}>الجولة الأولى من اليوم</option><option value={2}>الجولة الثانية من اليوم</option></select></label>
     <label className="block text-sm font-bold">الطاولة<select className="input mt-1" value={table ?? ''} onChange={e => setTable(e.target.value ? Number(e.target.value) : null)}><option value="">بدون تحديد</option>{Array.from({ length: t.settings.tablesCount }, (_, i) => <option key={i + 1} value={i + 1}>طاولة {i + 1}</option>)}</select></label>
     <p className="text-xs text-ink/60">اختر أي يوم تريده؛ أيام توفر الفرق للاسترشاد فقط في الإدخال اليدوي. مباراة واحدة لكل فريق بالجولة، وبحد أقصى مباراتين باليوم.</p>
