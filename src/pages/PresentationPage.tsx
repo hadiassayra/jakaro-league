@@ -1,4 +1,5 @@
 import { AnimatePresence, motion } from 'framer-motion';
+import { publicMatches } from '../lib/publicMatches';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import type { GroupId, QualStatus, Tournament } from '../lib/types';
@@ -132,7 +133,7 @@ export default function PresentationPage() {
   const lastResult = useRef<string | null>(null);
   useEffect(() => {
     if (!t) return;
-    const last = t.matches.filter(isFinished).sort((a, b) => (b.finishedAt ?? 0) - (a.finishedAt ?? 0))[0];
+    const last = publicMatches(t).filter(isFinished).sort((a, b) => (b.finishedAt ?? 0) - (a.finishedAt ?? 0))[0];
     const sig = last ? `${last.id}:${last.winnerId}:${last.loserMarbles}` : null;
     if (!paused && lastResult.current !== null && sig && sig !== lastResult.current) {
       const target: SlideKey = last.stage === 'knockout' ? 'bracket' : (last.group as SlideKey);
@@ -201,8 +202,9 @@ export default function PresentationPage() {
   const champ = champion(t.matches);
   const [rank, title] = SLIDE_TITLES[slide];
   const q = t.settings.qualifiersPerGroup;
-  const upcoming = nextMatches(t, 6);
-  const recent = t.matches
+  const visibleMatches = publicMatches(t);
+  const upcoming = nextMatches({ ...t, matches: visibleMatches }, 6);
+  const recent = visibleMatches
     .filter(isFinished)
     .sort((a, b) => (b.finishedAt ?? 0) - (a.finishedAt ?? 0))
     .slice(0, 4);

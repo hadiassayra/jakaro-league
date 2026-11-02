@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { publicMatches } from '../lib/publicMatches';
 import { Link } from 'react-router-dom';
 import { useViewTournament } from '../sync/useSync';
 import { useTheme } from '../components/useTheme';
@@ -17,9 +18,10 @@ export default function MatchDisplayPage() {
   const [fullscreenError, setFullscreenError] = useState('');
   const now = useNow(1000);
   if (!t) return <div className="board-bg grid min-h-dvh place-items-center"><MarbleLoader label={status === 'error' ? 'تعذّر الاتصال بالبطولة' : 'جارٍ تحميل المباريات…'} /></div>;
-  const ready = t.matches.filter(m => m.teamA && m.teamB && !isFinished(m));
+  const visibleMatches = publicMatches(t);
+  const ready = visibleMatches.filter(m => m.teamA && m.teamB && !isFinished(m));
   const playing = ready.filter(m => m.status === 'playing');
-  const results = t.matches.filter(isFinished).sort((a, b) => (b.finishedAt ?? 0) - (a.finishedAt ?? 0));
+  const results = visibleMatches.filter(isFinished).sort((a, b) => (b.finishedAt ?? 0) - (a.finishedAt ?? 0));
   const upcoming = ready.filter(m => m.status === 'upcoming').sort((a, b) => {
     const dayOrder = (matchDay(a) ?? '9999').localeCompare(matchDay(b) ?? '9999');
     return dayOrder || matchDayRound(a) - matchDayRound(b) || (a.scheduledAt ?? Infinity) - (b.scheduledAt ?? Infinity) || a.round - b.round;

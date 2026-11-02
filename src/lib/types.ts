@@ -66,6 +66,8 @@ export interface ThemeColors {
 }
 
 export interface Settings {
+  /** null/undefined = all fixture days; [] = no fixtures published. Standings stay cumulative. */
+  publicMatchDays?: string[] | null;
   name: string;
   maxMarbles: number;
   qualifiersPerGroup: number;

@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { publicMatches } from '../lib/publicMatches';
 import { TournamentRules } from '../components/TournamentRules';
 import { BackButton } from '../components/BackButton';
 import { matchDay, matchDayRound } from '../lib/playDay';
@@ -31,6 +32,7 @@ export default function LivePage() {
     );
 
   const st = allStandings(t);
+  const visibleMatches = publicMatches(t);
   const hasKo = t.matches.some((m) => m.stage === 'knockout');
   const champ = champion(t.matches);
   const q = t.settings.qualifiersPerGroup;
@@ -88,19 +90,19 @@ export default function LivePage() {
           {([1, 2] as const).map(slot => <section key={slot} className="mb-6">
             <h3 className="mb-3 text-2xl">{slot === 1 ? 'الجولة الأولى' : 'الجولة الثانية'}</h3>
             <div className="grid gap-3 sm:grid-cols-2">
-              {t.matches.filter(m => t.currentPlayDay && matchDay(m) === t.currentPlayDay && matchDayRound(m) === slot).map(m => <MatchCard key={m.id} t={t} m={m} showRound />)}
+              {visibleMatches.filter(m => t.currentPlayDay && matchDay(m) === t.currentPlayDay && matchDayRound(m) === slot).map(m => <MatchCard key={m.id} t={t} m={m} showRound />)}
             </div>
-            {!t.matches.some(m => t.currentPlayDay && matchDay(m) === t.currentPlayDay && matchDayRound(m) === slot) && <Empty>لم تُحدد مباريات لهذه الجولة بعد.</Empty>}
+            {!visibleMatches.some(m => t.currentPlayDay && matchDay(m) === t.currentPlayDay && matchDayRound(m) === slot) && <Empty>لا توجد مباريات منشورة لهذه الجولة بعد.</Empty>}
           </section>)}
-          {!t.matches.some(m => t.currentPlayDay && matchDay(m) === t.currentPlayDay) && <Empty>لم تُحدد مباريات لهذا اليوم بعد.</Empty>}
+          {!visibleMatches.some(m => t.currentPlayDay && matchDay(m) === t.currentPlayDay) && <Empty>لا توجد مباريات منشورة لهذا اليوم بعد.</Empty>}
         </section>}
         {(tab === 'upcoming' || tab === 'finished' || tab === 'matches') && (
           <section>
             <SectionTitle rank="7" title={tab === 'upcoming' ? 'المباريات الجاية' : tab === 'finished' ? 'المباريات اللي انلعبت' : 'المباريات ومواعيدها'} />
             <div className="grid gap-3 sm:grid-cols-2">
-              {t.matches.filter(m => tab === 'matches' || (tab === 'finished' ? isFinished(m) : !isFinished(m) && m.status === 'upcoming')).sort((a, b) => tab === 'finished' ? (b.finishedAt ?? 0) - (a.finishedAt ?? 0) : (a.scheduledAt ?? Infinity) - (b.scheduledAt ?? Infinity) || a.round - b.round).map(m => <MatchCard key={m.id} t={t} m={m} showRound />)}
+              {visibleMatches.filter(m => tab === 'matches' || (tab === 'finished' ? isFinished(m) : !isFinished(m) && m.status === 'upcoming')).sort((a, b) => tab === 'finished' ? (b.finishedAt ?? 0) - (a.finishedAt ?? 0) : (a.scheduledAt ?? Infinity) - (b.scheduledAt ?? Infinity) || a.round - b.round).map(m => <MatchCard key={m.id} t={t} m={m} showRound />)}
             </div>
-            {!t.matches.some(m => tab === 'matches' || (tab === 'finished' ? isFinished(m) : !isFinished(m) && m.status === 'upcoming')) && <Empty>لا توجد مباريات في هذا القسم.</Empty>}
+            {!visibleMatches.some(m => tab === 'matches' || (tab === 'finished' ? isFinished(m) : !isFinished(m) && m.status === 'upcoming')) && <Empty>لا توجد مباريات منشورة في هذا القسم.</Empty>}
           </section>
         )}
         {(tab === 'standings' || tab === 'groupB') &&

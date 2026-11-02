@@ -14,6 +14,9 @@ import { palestineDateTime, parseMatchTime } from '../lib/matchTime';
 import { teamName } from '../lib/tournament';
 import { assertAvailable } from '../lib/availability';
 import { AvailabilityScheduler } from '../components/AvailabilityScheduler';
+import { ManualMatchModal } from '../components/ManualMatchModal';
+import { PublicDaysControl } from '../components/PublicDaysControl';
+import { deleteGroupMatch } from '../lib/manualMatches';
 
 type StatusFilter = 'all' | 'upcoming' | 'playing' | 'finished';
 
@@ -21,6 +24,7 @@ export default function MatchesPage() {
   const t = useStore((s) => s.t);
   const apply = useStore((s) => s.apply);
   const [schedule, setSchedule] = useState<Match | null>(null);
+  const [creating, setCreating] = useState(false);
   const [open, setOpen] = useState<Match | null>(null);
   const [group, setGroup] = useState<GroupId | 'all'>('all');
   const [status, setStatus] = useState<StatusFilter>('all');
@@ -33,6 +37,11 @@ export default function MatchesPage() {
   const gm = t.matches.filter((m) => m.stage === 'group');
   const ungrouped = t.teams.filter((x) => !x.group).length;
   const outdated = scheduleOutdated(t);
+
+  const cancelMatch = async (m: Match) => {
+    if (!await confirmDialog({ title: 'إلغاء المباراة؟', message: `${teamName(t, m.teamA)} × ${teamName(t, m.teamB)} — ستُحذف المباراة من الجدول ورابط الجمهور.${isFinished(m) || m.cards ? ' ستُحذف نتيجتها وبطاقاتها ويُعاد احتساب النقاط.' : ''} يمكنك استرجاعها بزر التراجع.`, confirmText: 'إلغاء المباراة', danger: true })) return;
+    if (apply(x => deleteGroupMatch(x, m.id), 'إلغاء مباراة')) toast('تم إلغاء المباراة');
+  };
 
   const regenerate = async () => {
     if (gm.length) {
@@ -80,6 +89,8 @@ export default function MatchesPage() {
         title="المباريات"
         sub={gm.length ? `${gm.filter(isFinished).length}/${gm.length} مباراة مجموعات منتهية` : undefined}
         actions={
+          <div className="flex flex-wrap gap-2">
+          <button className="btn btn-primary" disabled={t.groupsLocked || t.teams.length < 2} onClick={() => setCreating(true)}>＋ إنشاء مباراة</button>
           <details className="relative">
             <summary className="btn btn-ghost cursor-pointer">إدارة الجدول</summary>
             <div className="absolute end-0 z-20 mt-2 flex w-64 flex-col gap-2 rounded-xl border border-ink/15 bg-surface p-3 shadow-xl">
@@ -93,8 +104,10 @@ export default function MatchesPage() {
             )}
             </div>
           </details>
+          </div>
         }
       />
+      <PublicDaysControl />
       <section className="board mb-5 space-y-4 p-4">
         <h2 className="text-2xl">جدول يوم اللعب</h2>
         <p className="text-sm text-ink/70">جولتان باليوم، ومباراة واحدة لكل فريق في كل جولة.</p>
@@ -185,6 +198,7 @@ export default function MatchesPage() {
                   <div key={m.id} className="space-y-2">
                     <MatchCard t={t} m={m} onOpen={setOpen} showRound />
                     <button className="btn btn-ghost btn-sm w-full" disabled={isFinished(m) || m.status === 'playing' || (m.stage === 'group' && t.groupsLocked)} onClick={() => setSchedule(m)}>{matchDay(m) ? 'تعديل الموعد والجولة' : 'تحديد الموعد والجولة'}</button>
+                    <button className="btn btn-ghost btn-sm w-full text-loss" disabled={t.groupsLocked} onClick={() => cancelMatch(m)}>إلغاء المباراة</button>
                   </div>
                 ))}
               </div>
@@ -193,6 +207,7 @@ export default function MatchesPage() {
         })}
       </div>
       {schedule && <ScheduleModal key={schedule.id} match={schedule} day={day} round={dayRound} onClose={() => setSchedule(null)} />}
+      {creating && <ManualMatchModal day={day} round={dayRound} onClose={() => setCreating(false)} />}
       <ResultModal match={open} onClose={() => setOpen(null)} />
     </div>
   );
