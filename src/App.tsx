@@ -19,6 +19,7 @@ import PresentationPage from './pages/PresentationPage';
 import LivePage from './pages/LivePage';
 import RulesPage from './pages/RulesPage';
 import MatchDisplayPage from './pages/MatchDisplayPage';
+import DrawShowPage from './pages/DrawShowPage';
 import { SyncAccountGate } from './components/SyncAccountGate';
 
 function AdminArea() {
@@ -42,6 +43,7 @@ export const appRoutes = (
         <Route path="/live" element={<LivePage />} />
         <Route path="/show" element={<PresentationPage />} />
         <Route path="/match-display" element={<MatchDisplayPage />} />
+        <Route path="/draw-show" element={<DrawShowPage />} />
         <Route
           path="admin"
           element={

@@ -30,7 +30,7 @@ describe('public and private navigation', () => {
     }
   });
   it('does not expose login on the other public screens', () => {
-    for (const url of ['/live', '/match-display', '/show']) {
+    for (const url of ['/live', '/match-display', '/show', '/draw-show']) {
       expect(matchRoutes(routes, url)!.some(m => includesGate(m.route.element))).toBe(false);
     }
   });

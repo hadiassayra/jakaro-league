@@ -12,6 +12,7 @@ import { generateSchedule, hasGroupResults, withLog } from '../lib/tournament';
 import { playDrop, playWin } from '../lib/sound';
 import { groupLabel } from '../components/StandingsTable';
 import { Empty, Marble, SectionTitle, TeamMarble } from '../components/ui';
+import { publicLink } from '../components/SharePanel';
 
 type Slot = GroupId | null;
 
@@ -61,11 +62,13 @@ export default function DrawPage() {
   const [draftSource, setDraftSource] = useState('');
   const [fileError, setFileError] = useState('');
   const [loading, setLoading] = useState(false);
+  const editedLocally = useRef(false);
   const loadRows = (rows: ParsedTeamRow[], source: string) => {
     const invalid = rows.filter(row => row.issues.includes('badDays') || row.issues.includes('duplicate'));
     if (invalid.length) throw new Error(`راجع صفوف الأيام أو الأسماء المتكررة: ${invalid.map(r => r.rowNumber).join('، ')}`);
     const next = draftTeamsFromRows(rows, t.teams);
     if (next.length < 2) throw new Error('الملف لا يحتوي على فريقين صالحين على الأقل.');
+    editedLocally.current = true;
     setDraftTeams(next); setAssign(drawByAvailability(next)); setDraftSource(source); setFileError('');
   };
   const [assign, setAssign] = useState<Record<string, Slot>>(() =>
@@ -80,11 +83,12 @@ export default function DrawPage() {
   useEffect(() => () => timers.current.forEach(clearTimeout), []);
   // keep new/removed teams in sync
   useEffect(() => {
-    setAssign((a) => Object.fromEntries(teams.map((x) => [x.id, x.id in a ? a[x.id] : x.group])));
+    setAssign((a) => Object.fromEntries(teams.map((x) => [x.id, editedLocally.current && x.id in a ? a[x.id] : x.group])));
   }, [teams]);
 
   const startDraw = () => {
     if (teams.filter(team => team.availableDays?.length).length < 2) { setFileError('حمّل الشيت أو حدّد أيام فريقين على الأقل أولاً.'); return; }
+    editedLocally.current = true;
     timers.current.forEach(clearTimeout);
     const target = drawByAvailability(teams);
     const order = teams.map(x => x.id);
@@ -110,6 +114,7 @@ export default function DrawPage() {
 
   const move = (id: string, g: Slot) => {
     if (running || !teams.some(team => team.id === id)) return;
+    editedLocally.current = true;
     setAssign((a) => ({ ...a, [id]: g }));
     setSelected(null);
     playDrop();
@@ -208,6 +213,11 @@ export default function DrawPage() {
         sub="توزيع متوازن يفضّل الأيام المشتركة ويقلّل المواجهات المتعارضة. يمكنك مراجعة الاقتراح ونقل الفرق يدوياً."
         actions={
           <>
+            <button className="btn btn-primary" disabled={running || changed || !t.teams.length || t.teams.some(team => !team.group)} title="يعرض التوزيع المعتمد دون تغييره" onClick={() => {
+              const base = publicLink(t, 'draw-show');
+              const url = `${base}${base.includes('?') ? '&' : '?'}autostart=1`;
+              if (!window.open(url, 'jakaro-draw-show', 'popup,width=1440,height=960')) toast('اسمح بفتح نافذة العرض ثم اضغط الزر مرة أخرى.');
+            }}>📺 تشغيل عرض القرعة للمشاركين</button>
             <button className="btn btn-accent" onClick={startDraw} disabled={running || teams.filter(team => team.availableDays?.length).length < 2 || t.groupsLocked}>
               📅 توزيع حسب الأيام
             </button>
@@ -217,6 +227,7 @@ export default function DrawPage() {
           </>
         }
       />
+      <p className="mb-3 text-xs text-ink/60">عرض المشاركين يكشف الفرق بالتدريج من التوزيع المعتمد. إذا عدّلت الاقتراح، اعتمده أولاً لتشغيل العرض.</p>
       <section className="board mb-4 space-y-3 p-4">
         <h2 className="text-xl">أيام الفرق من الشيت</h2>
         <div className="flex flex-wrap gap-2">
@@ -228,7 +239,7 @@ export default function DrawPage() {
             setLoading(true); setFileError('');
             try { loadRows(parseTeamRows(await readSheet(file)).rows, file.name); } catch (error) { setFileError((error as Error).message); } finally { setLoading(false); }
           }} /></label>
-          {draftTeams && <button className="btn btn-ghost" disabled={running} onClick={() => { setDraftTeams(null); setDraftSource(''); setAssign(Object.fromEntries(t.teams.map(team => [team.id, team.group]))); }}>إلغاء المعاينة</button>}
+          {draftTeams && <button className="btn btn-ghost" disabled={running} onClick={() => { editedLocally.current = false; setDraftTeams(null); setDraftSource(''); setAssign(Object.fromEntries(t.teams.map(team => [team.id, team.group]))); }}>إلغاء المعاينة</button>}
         </div>
         <p className="text-sm text-ink/65">هذه معاينة فقط. عند الاعتماد تُستبدل قائمة الفرق والتوزيع حسب الشيت ويُعاد توليد الجدول، بعد تأكيد حذف النتائج الحالية إن وجدت. الأيام واللاعبون ظاهرة للمراجعة؛ لا تُستورد أرقام الهواتف.</p>
         {draftTeams && <p className="text-sm font-bold">{draftSource} · {teams.length} فريق · فرق حالية غير موجودة بالشيت: {t.teams.filter(team => !teams.some(next => next.id === team.id)).map(team => team.name).join('، ') || 'لا يوجد'}</p>}

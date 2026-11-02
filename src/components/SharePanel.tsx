@@ -9,7 +9,7 @@ export function baseUrl(t: Tournament): string {
   return window.location.origin + window.location.pathname;
 }
 
-export function publicLink(t: Tournament, path: 'live' | 'show' = 'live'): string {
+export function publicLink(t: Tournament, path: 'live' | 'show' | 'draw-show' = 'live'): string {
   const config = getSyncConfig();
   const params = new URLSearchParams();
   if (config) {
