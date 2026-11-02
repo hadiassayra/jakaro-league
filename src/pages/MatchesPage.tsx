@@ -18,6 +18,7 @@ import { PublicDaysControl } from '../components/PublicDaysControl';
 import { deleteGroupMatch } from '../lib/manualMatches';
 import { GroupOpponents } from '../components/GroupOpponents';
 import { ReplacementMatchesModal } from '../components/ReplacementMatchesModal';
+import { DayImageButton } from '../components/DayImageButton';
 
 type StatusFilter = 'all' | 'upcoming' | 'playing' | 'finished';
 
@@ -123,6 +124,7 @@ export default function MatchesPage() {
           }} /></label>
           <button className={`btn ${dayOnly ? 'btn-primary' : 'btn-ghost'}`} aria-pressed={dayOnly} onClick={() => setDayOnly(!dayOnly)}>{dayOnly ? 'عرض كل المباريات' : 'عرض مباريات هذا اليوم فقط'}</button>
           <span className="chip bg-primary/15">{gm.filter(m => matchDay(m) === day).length} مباراة في اليوم</span>
+          <DayImageButton day={day} />
         </div>
         <div className="flex flex-wrap gap-2" aria-label="اختيار جولة اليوم">
           {([1, 2] as const).map(slot => <button key={slot} className={`btn ${dayRound === slot ? 'btn-primary' : 'btn-ghost'}`} aria-pressed={dayRound === slot} onClick={() => setDayRound(slot)}>{slot === 1 ? 'الجولة الأولى' : 'الجولة الثانية'} — {gm.filter(m => matchDay(m) === day && matchDayRound(m) === slot).length} مباراة</button>)}
